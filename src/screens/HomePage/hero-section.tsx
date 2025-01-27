@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { LoadingBar } from "@/components/loading-bar";
 
 export function HeroSection() {
   return (
@@ -23,6 +24,9 @@ export function HeroSection() {
               Simplifying the hiring process for transportation companies and helping drivers find their next
               opportunity. The most advanced job and load board platform for the modern trucking industry.
             </p>
+            <div className="mt-8 w-full max-w-md mx-auto">
+              <LoadingBar />
+            </div>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Button size="lg">Get started</Button>
               <Button variant="outline" size="lg">
@@ -30,18 +34,6 @@ export function HeroSection() {
               </Button>
             </div>
           </div>
-
-          {/* <div className="mt-16 flow-root sm:mt-24">
-            <div className="relative rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-              <Image
-                src="/placeholder.svg?height=900&width=1400"
-                alt="App screenshot"
-                width={2432}
-                height={1442}
-                className="rounded-md shadow-2xl ring-1 ring-gray-900/10"
-              />
-            </div>
-          </div> */}
         </div>
       </div>
     </div>
