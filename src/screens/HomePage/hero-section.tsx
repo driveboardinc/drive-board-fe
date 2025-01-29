@@ -12,20 +12,16 @@ export function HeroSection() {
 
   return (
     <section>
-      <div className="py-24 sm:py-32 lg:pb-40">
+      <div className="py-12 sm:py-16 lg:pb-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-8 aspect-video w-full max-w-2xl mx-auto rounded-lg overflow-hidden shadow-lg">
-              <video
-                className="w-full h-full object-cover"
-                poster="/placeholder.svg?height=400&width=800"
-                controls
-              >
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="mb-8 aspect-video w-full max-w-full mx-auto rounded-lg overflow-hidden shadow-lg">
+              <video className="w-full h-full object-cover" poster="/thumbnail.webp" controls>
                 <source src="https://example.com/placeholder-video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            <h1 className="text-4xl font-bold tracking-tight text-custom-black sm:text-6xl">
               Building Your Next Tech-Driven Transportation Job Board
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-600">
