@@ -4,23 +4,25 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 
 const navigation = [
   { name: "Home", href: "/" },
   { name: "About Us", href: "/about" },
   { name: "Driver Resources", href: "/resources" },
   { name: "Live Board", href: "/board" },
+  { name: "Contact Us", href: "/contact-us" },
 ];
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed w-full bg-white/80 backdrop-blur-md z-50">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+    <header className="  px-40 w-full bg-transparent backdrop-blur-md z-50">
+      <nav className=" flex items-center justify-between" aria-label="Global">
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 text-2xl font-bold">
-            GoDriveBoard
+            <Image src="/uploads/driveboard_logo.png" alt="logo" width={100} height={100} />
           </Link>
         </div>
         <div className="flex lg:hidden">
@@ -38,7 +40,7 @@ export function Navbar() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm font-semibold leading-6 text-gray-900 hover:text-gray-600"
+              className="text-base font-normal leading-6 text-gray-900 hover:text-gray-600"
             >
               {item.name}
             </Link>
@@ -73,7 +75,7 @@ export function Navbar() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-normal leading-7 text-gray-900 hover:bg-gray-50"
                   >
                     {item.name}
                   </Link>

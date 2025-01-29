@@ -16,6 +16,11 @@ export default {
         inter: ["Inter", "sans-serif"],
       },
       colors: {
+        custom: {
+          purple: "#5852a1",
+          "light-gray": "#f4f6fa",
+          black: "#333333",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

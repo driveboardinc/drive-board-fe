@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Facebook, Twitter, Linkedin } from "lucide-react";
+import Image from "next/image";
 
 const navigation = {
   solutions: [
@@ -30,29 +31,29 @@ const navigation = {
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900" aria-labelledby="footer-heading">
+    <footer className="bg-white" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">
         Footer
       </h2>
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div className="space-y-8">
-            <Link href="/" className="text-2xl font-bold text-white">
-              GoDriveBoard
+          <div className="flex flex-col gap-4 items-start justify-center">
+            <Link href="/" className="-m-1.5 p-1.5 text-2xl font-bold">
+              <Image src="/uploads/driveboard_logo.png" alt="logo" width={200} height={100} />
             </Link>
-            <p className="text-sm leading-6 text-gray-300">
+            <p className="text-sm leading-6 text-gray-700">
               The most advanced job and load board platform for the modern trucking industry.
             </p>
             <div className="flex space-x-6">
-              <Link href="#" className="text-gray-500 hover:text-gray-400">
+              <Link href="#" className="text-gray-700 hover:text-gray-400">
                 <span className="sr-only">Facebook</span>
                 <Facebook className="h-6 w-6" />
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-gray-400">
+              <Link href="#" className="text-gray-700 hover:text-gray-400">
                 <span className="sr-only">Twitter</span>
                 <Twitter className="h-6 w-6" />
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-gray-400">
+              <Link href="#" className="text-gray-700 hover:text-gray-400">
                 <span className="sr-only">LinkedIn</span>
                 <Linkedin className="h-6 w-6" />
               </Link>
@@ -61,11 +62,11 @@ export function Footer() {
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6 text-white">Solutions</h3>
+                <h3 className="text-sm font-semibold leading-6 text-gray-700">Solutions</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.solutions.map((item) => (
                     <li key={item.name}>
-                      <Link href={item.href} className="text-sm leading-6 text-gray-300 hover:text-white">
+                      <Link href={item.href} className="text-sm leading-6 text-gray-700 hover:text-gray-700">
                         {item.name}
                       </Link>
                     </li>
@@ -73,11 +74,11 @@ export function Footer() {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold leading-6 text-white">Support</h3>
+                <h3 className="text-sm font-semibold leading-6 text-gray-700">Support</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.support.map((item) => (
                     <li key={item.name}>
-                      <Link href={item.href} className="text-sm leading-6 text-gray-300 hover:text-white">
+                      <Link href={item.href} className="text-sm leading-6 text-gray-700 hover:text-gray-700">
                         {item.name}
                       </Link>
                     </li>
@@ -87,11 +88,11 @@ export function Footer() {
             </div>
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold leading-6 text-white">Company</h3>
+                <h3 className="text-sm font-semibold leading-6 text-gray-700">Company</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.company.map((item) => (
                     <li key={item.name}>
-                      <Link href={item.href} className="text-sm leading-6 text-gray-300 hover:text-white">
+                      <Link href={item.href} className="text-sm leading-6 text-gray-700 hover:text-gray-700">
                         {item.name}
                       </Link>
                     </li>
@@ -99,11 +100,11 @@ export function Footer() {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold leading-6 text-white">Legal</h3>
+                <h3 className="text-sm font-semibold leading-6 text-gray-700">Legal</h3>
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.legal.map((item) => (
                     <li key={item.name}>
-                      <Link href={item.href} className="text-sm leading-6 text-gray-300 hover:text-white">
+                      <Link href={item.href} className="text-sm leading-6 text-gray-700 hover:text-gray-700">
                         {item.name}
                       </Link>
                     </li>
