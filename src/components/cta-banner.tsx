@@ -8,14 +8,15 @@ export function CTABanner() {
           <div className="flex flex-col md:flex-row items-center justify-center md:justify-between relative z-10">
             <div className="flex flex-col  ">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center md:text-start">
-                Drive Your Career Forward
+                Connect With The Best
               </h2>
               <p className="text-lg text-green-100 mb-8 text-center md:text-start">
-                Find top trucking jobs that match your skills and schedule.
+                Whether you&apos;re a driver, broker, or carrier, access exclusive deals to <br />
+                maximize your profits and efficiency.
               </p>
             </div>
             <Button variant="secondary" size="lg" className="bg-white text-black hover:bg-green-50">
-              FIND TRUCKING JOBS
+              EXPLORE MORE
             </Button>
           </div>
 

@@ -42,7 +42,8 @@ export function Footer() {
               <Image src="/uploads/driveboard_logo.png" alt="logo" width={200} height={100} />
             </Link>
             <p className="text-sm leading-6 text-gray-700">
-              The most advanced job and load board platform for the modern trucking industry.
+              A platform connecting drivers with top delivery jobs while helping companies hire reliable,
+              vetted professionals easily.
             </p>
             <div className="flex space-x-6">
               <Link href="#" className="text-gray-700 hover:text-gray-400">

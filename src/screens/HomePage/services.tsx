@@ -44,9 +44,9 @@ export function ServicesSection() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {services.map((service, index) => (
             <div key={index} className="flex flex-col items-center text-center group py-8 ">
-              <div className="w-16 h-16 rounded-full  flex items-center justify-center mb-4 bg-white shadow-lg group-hover:shadow-xl transition-shadow">
+              <div className="w-16 h-16 rounded-full  flex items-center justify-center mb-4 bg-white shadow-lg group-hover:shadow-xl  transition-shadow">
                 <service.icon
-                  className={`w-8 h-8  ${index % 2 === 0 ? "text-green-500" : "text-[#5852A1]"}`}
+                  className={`w-8 h-8  ${index % 2 === 0 ? "text-custom-purple" : "text-custom-purple"} `}
                 />
               </div>
               <p className="text-gray-700 font-medium ">{service.name}</p>

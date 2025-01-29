@@ -36,9 +36,9 @@ export function Benefits() {
 
   return (
     <div className="px-4 py-24 sm:py-32 flex justify-center bg-gray-50">
-      <div className="mx-auto w-full px-6 lg:px-8 border">
+      <div className="mx-auto w-full px-6 lg:px-8 ">
         <motion.div
-          className="mx-auto max-w-2xl lg:text-center border"
+          className="mx-auto max-w-2xl lg:text-center "
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
