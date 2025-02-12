@@ -77,7 +77,7 @@ export function Benefits() {
       if (expandedBenefitId && contentRefs.current[expandedBenefitId]) {
         gsap.to(contentRefs.current[expandedBenefitId], {
           height: 0,
-          opacity: 5,
+          opacity: 0,
           duration: 1,
           ease: "power2.inOut",
         });
@@ -93,7 +93,7 @@ export function Benefits() {
         { height: 0, opacity: 0 },
         {
           height: naturalHeight,
-          opacity: 5,
+          opacity: 1,
           duration: 0.7,
           ease: "power2.out",
           onStart: () => setExpandedBenefitId(id),
@@ -144,7 +144,9 @@ export function Benefits() {
                 </div>
 
                 <div
-                  ref={(el) => (contentRefs.current[benefit.id] = el)}
+                  ref={(el) => {
+                    contentRefs.current[benefit.id] = el;
+                  }}
                   className="absolute left-0 right-0 w-full overflow-hidden"
                   style={{
                     top: "calc(100% - 16px)",
