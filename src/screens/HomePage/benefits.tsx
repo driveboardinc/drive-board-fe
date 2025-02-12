@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Truck, Users, Clock } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { Truck, Users, Clock, ChevronDown } from "lucide-react";
+import gsap from "gsap";
 
 const benefits = [
   {
+    id: "drivers",
     name: "For Drivers",
     description:
       "Find the best driving opportunities that match your qualifications. Access exclusive resources and discounts.",
@@ -14,6 +15,7 @@ const benefits = [
     hoverColor: "hover:bg-green-600",
   },
   {
+    id: "carriers",
     name: "For Carriers",
     description:
       "Post jobs and find qualified drivers quickly. Manage applications and communicate with candidates all in one place.",
@@ -22,6 +24,7 @@ const benefits = [
     hoverColor: "hover:bg-yellow-600",
   },
   {
+    id: "brokers",
     name: "For Brokers",
     description:
       "Connect with reliable carriers and drivers. Streamline your operations with our advanced matching system.",
@@ -32,78 +35,134 @@ const benefits = [
 ];
 
 export function Benefits() {
-  const [hoveredBenefit, setHoveredBenefit] = useState<string | null>(null);
+  const [expandedBenefitId, setExpandedBenefitId] = useState<string | null>(null);
+  const contentRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Animate header on mount
+    gsap.from(headerRef.current, {
+      opacity: 0,
+      y: 20,
+      duration: 1,
+      ease: "power2.out",
+    });
+
+    // Animate benefits cards
+    gsap.from(".benefit-card", {
+      opacity: 0,
+      y: 30,
+      duration: 1,
+      stagger: 0.2,
+      ease: "power2.out",
+      delay: 0.4,
+    });
+  }, []);
+
+  const toggleExpand = (id: string) => {
+    const contentElement = contentRefs.current[id];
+    if (!contentElement) return;
+
+    if (expandedBenefitId === id) {
+      // Collapse animation
+      gsap.to(contentElement, {
+        height: 0,
+        opacity: 0,
+        duration: 1,
+        ease: "power2.inOut",
+        onComplete: () => setExpandedBenefitId(null),
+      });
+    } else {
+      // If there's an expanded benefit, collapse it first
+      if (expandedBenefitId && contentRefs.current[expandedBenefitId]) {
+        gsap.to(contentRefs.current[expandedBenefitId], {
+          height: 0,
+          opacity: 5,
+          duration: 1,
+          ease: "power2.inOut",
+        });
+      }
+
+      // Set height to auto temporarily to get the natural height
+      gsap.set(contentElement, { height: "auto", opacity: 1 });
+      const naturalHeight = contentElement.offsetHeight;
+
+      // Set back to 0 and animate to natural height
+      gsap.fromTo(
+        contentElement,
+        { height: 0, opacity: 0 },
+        {
+          height: naturalHeight,
+          opacity: 5,
+          duration: 0.7,
+          ease: "power2.out",
+          onStart: () => setExpandedBenefitId(id),
+        }
+      );
+    }
+  };
 
   return (
-    <div className="px-4 py-24 sm:py-32 flex justify-center bg-gray-50">
-      <div className="mx-auto w-full px-6 lg:px-8 ">
-        <motion.div
-          className="mx-auto max-w-2xl lg:text-center "
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2 className="text-base font-semibold leading-7 text-[#5852A1]">Why Choose Us</h2>
-          <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+    <div className="py-24 sm:py-32 bg-gradient-to-b from-gray-50 to-white">
+      <div className="mx-auto px-4 sm:px-6 lg:px-40">
+        <div ref={headerRef} className="max-w-3xl mx-auto text-center">
+          <h2 className="text-base font-semibold text-[#5852A1]">Why Choose Us</h2>
+          <h3 className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
             Everything you need to succeed in transportation
-          </p>
+          </h3>
           <p className="mt-6 text-xl leading-8 text-gray-600">
             GoDriveBoard provides a comprehensive platform that serves all stakeholders in the transportation
             industry.
           </p>
-        </motion.div>
-        <motion.div
-          className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-            {benefits.map((benefit, index) => (
-              <motion.div
-                key={benefit.name}
-                className="relative flex flex-col items-center text-center rounded-3xl shadow-lg overflow-hidden"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onHoverStart={() => setHoveredBenefit(benefit.name)}
-                onHoverEnd={() => setHoveredBenefit(null)}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className={`w-full h-full ${benefit.color} p-8`}>
-                  <dt className="flex flex-col items-center gap-y-4 text-xl font-bold leading-7 text-white">
-                    <div className="p-4 rounded-full bg-white bg-opacity-20">
-                      <benefit.icon className="h-10 w-10 text-white" aria-hidden="true" />
-                    </div>
-                    {benefit.name}
-                  </dt>
-                </div>
-                <AnimatePresence>
-                  {hoveredBenefit === benefit.name && (
-                    <motion.div
-                      className="absolute inset-0 flex items-center justify-center bg-black text-white p-6"
-                      initial={{ height: 0 }}
-                      animate={{ height: "100%" }}
-                      exit={{ height: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                    >
-                      <motion.p
-                        className="text-lg"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2, delay: 0.1 }}
+        </div>
+
+        <div className="mt-16 sm:mt-20 lg:mt-24">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {benefits.map((benefit) => (
+              <div key={benefit.id} className="relative benefit-card">
+                <div className={`rounded-2xl shadow-lg ${benefit.color}`}>
+                  <div className="p-6 text-white">
+                    <div className="flex items-center justify-between">
+                      <dt className="flex items-center text-xl font-bold">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white bg-opacity-20 mr-4">
+                          <benefit.icon className="h-6 w-6" aria-hidden="true" />
+                        </div>
+                        {benefit.name}
+                      </dt>
+                      <button
+                        onClick={() => toggleExpand(benefit.id)}
+                        className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all"
                       >
-                        {benefit.description}
-                      </motion.p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                        <ChevronDown
+                          className={`h-6 w-6 transition-transform duration-300 ${
+                            expandedBenefitId === benefit.id ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  ref={(el) => (contentRefs.current[benefit.id] = el)}
+                  className="absolute left-0 right-0 w-full overflow-hidden"
+                  style={{
+                    top: "calc(100% - 16px)",
+                    zIndex: 10,
+                    height: 0,
+                    opacity: 0,
+                  }}
+                >
+                  <div className={`${benefit.color} rounded-b-2xl shadow-lg`}>
+                    <div className="p-6 text-white">
+                      <p className="text-lg">{benefit.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
-          </dl>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   );

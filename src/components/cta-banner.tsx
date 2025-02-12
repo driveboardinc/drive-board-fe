@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 
 export function CTABanner() {
   return (
-    <div className="bg-[#F9FAFB] w-full px-4 md:px-40 lg:px-40 py-8">
+    <div className=" w-full px-4 md:px-40 lg:px-40 py-8">
       <div className="w-full max-w-7xl mx-auto">
         <div className="bg-custom-purple rounded-2xl p-8 md:p-12 shadow-xl relative overflow-hidden">
           <div className="flex flex-col md:flex-row items-center justify-center md:justify-between relative z-10">

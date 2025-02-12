@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 
 export function CallToAction() {
   return (
-    <div className="bg-white">
-      <div className="mx-auto max-w-7xl py-24 sm:px-6 sm:py-32 lg:px-8">
-        <div className="relative isolate overflow-hidden bg-gray-900 px-6 py-24 text-center shadow-2xl sm:rounded-3xl sm:px-16">
+    <div className="">
+      <div className="mx-auto max-w-7xl ">
+        <div className="relative isolate overflow-hidden bg-gray-900 px-6 py-10 text-center shadow-2xl sm:rounded-3xl sm:px-16">
           <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Ready to transform your transportation business?
           </h2>
@@ -16,7 +16,7 @@ export function CallToAction() {
             <Button size="lg" variant="secondary">
               Sign up now
             </Button>
-            <Button variant="outline" size="lg" className="text-white border-white hover:bg-white/10">
+            <Button variant="default" size="lg" className="text-white border-white hover:bg-white/10">
               Contact sales
             </Button>
           </div>

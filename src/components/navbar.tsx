@@ -8,7 +8,7 @@ import Image from "next/image";
 
 const navigation = [
   { name: "Home", href: "/" },
-  { name: "About Us", href: "/about" },
+  { name: "About Us", href: "/about-us" },
   { name: "Driver Resources", href: "/resources" },
   { name: "Live Board", href: "/board" },
   { name: "Contact Us", href: "/contact-us" },
@@ -48,7 +48,9 @@ export function Navbar() {
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
           <Button variant="outline">Log in</Button>
-          <Button>Sign up</Button>
+          <Link href="/signup">
+            <Button className="w-full">Sign up</Button>
+          </Link>
         </div>
       </nav>
 
@@ -85,7 +87,9 @@ export function Navbar() {
                 <Button variant="outline" className="w-full">
                   Log in
                 </Button>
-                <Button className="w-full">Sign up</Button>
+                <Link href="/signup">
+                  <Button className="w-full">Sign up</Button>
+                </Link>
               </div>
             </div>
           </div>

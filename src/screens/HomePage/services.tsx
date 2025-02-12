@@ -1,30 +1,30 @@
 import {
-  Mail,
-  Phone,
-  MessageCircle,
   UserCheck,
   Shield,
   ShoppingBag,
   Users,
-  BarChart,
   Layers,
   FileText,
   List,
   Award,
   HelpCircle,
   Bot,
+  MailWarning,
+  MessageCircleWarning,
+  Truck,
+  MessagesSquare,
 } from "lucide-react";
 
 export function ServicesSection() {
   const services = [
-    { icon: Mail, name: "Email Alerts" },
-    { icon: Phone, name: "Sms Alerts" },
-    { icon: MessageCircle, name: "Messaging" },
+    { icon: MailWarning, name: "Email Alerts" },
+    { icon: MessageCircleWarning, name: "Sms Alerts" },
+    { icon: MessagesSquare, name: "Messaging" },
     { icon: UserCheck, name: "Recruiting Tools" },
     { icon: Shield, name: "Insurance Discounts" },
     { icon: ShoppingBag, name: "Rental Discounts" },
     { icon: Users, name: "Driver Resources" },
-    { icon: BarChart, name: "Load Board" },
+    { icon: Truck, name: "Load Board" },
     { icon: Layers, name: "Dedicated Lanes" },
     { icon: FileText, name: "Job Posting" },
     { icon: Bot, name: "AI Pre-Screening" },
@@ -38,7 +38,7 @@ export function ServicesSection() {
     <div className="py-16 px-4 md:px-80 lg:px-80 bg-gradient-to-br from-white to-purple-50 ">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
-          Supporting Truck Drivers Every Step of the Way
+          Explore Our Key Features
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5">

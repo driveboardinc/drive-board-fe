@@ -10,15 +10,15 @@ const navigation = {
     { name: "Pricing", href: "#" },
   ],
   support: [
-    { name: "Documentation", href: "#" },
-    { name: "Guides", href: "#" },
-    { name: "API Status", href: "#" },
+    { name: "Demo", href: "#" },
+    { name: "Driver Resources", href: "#" },
+    { name: "API Status & Automation", href: "#" },
     { name: "Contact Support", href: "#" },
   ],
   company: [
-    { name: "About", href: "#" },
-    { name: "Blog", href: "#" },
-    { name: "Jobs", href: "#" },
+    { name: "About Us", href: "#" },
+    { name: "Get Started", href: "#" },
+    { name: "Events", href: "#" },
     { name: "Press", href: "#" },
   ],
   legal: [
@@ -35,8 +35,8 @@ export function Footer() {
       <h2 id="footer-heading" className="sr-only">
         Footer
       </h2>
-      <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
-        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
+      <div className="mx-auto max-w-7xl px-6 pt-10 ">
+        <div className="xl:grid xl:grid-cols-3 xl:gap-8 ">
           <div className="flex flex-col gap-4 items-start justify-center">
             <Link href="/" className="-m-1.5 p-1.5 text-2xl font-bold">
               <Image src="/uploads/driveboard_logo.png" alt="logo" width={200} height={100} />
@@ -115,7 +115,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-        <div className="mt-16 border-t border-white/10 pt-8 sm:mt-20 lg:mt-24">
+        <div className=" border-t border-white/10 py-4">
           <p className="text-xs leading-5 text-gray-400">
             &copy; {new Date().getFullYear()} GoDriveBoard. All rights reserved.
           </p>
