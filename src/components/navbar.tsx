@@ -84,9 +84,11 @@ export function Navbar() {
                 ))}
               </div>
               <div className="py-6 space-y-2">
-                <Button variant="outline" className="w-full">
-                  Log in
-                </Button>
+                <Link href="/signin">
+                  <Button variant="outline" className="w-full">
+                    Log in
+                  </Button>
+                </Link>
                 <Link href="/signup">
                   <Button className="w-full">Sign up</Button>
                 </Link>
