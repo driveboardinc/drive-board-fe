@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
-import { SigninVector } from "@/components/svg-vector/signin-vector";
-import { Icons } from "@/components/icon";
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { SigninVector } from '@/components/svg-vector/signin-vector';
+import { Icons } from '@/components/icon';
 
 export default function SigninPage() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -18,7 +18,10 @@ export default function SigninPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("%cForm Data (For Backend API):", "color: blue; font-weight: bold;");
+    console.log(
+      '%cForm Data (For Backend API):',
+      'color: blue; font-weight: bold;'
+    );
     console.log(JSON.stringify(formData, null, 2));
   };
 
@@ -43,7 +46,10 @@ export default function SigninPage() {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
-              <Label htmlFor="email" className="text-lg font-medium text-gray-700">
+              <Label
+                htmlFor="email"
+                className="text-lg font-medium text-gray-700"
+              >
                 Email Address
               </Label>
               <Input
@@ -56,7 +62,10 @@ export default function SigninPage() {
                 className="w-full h-12 font-inter"
               />
 
-              <Label htmlFor="password" className="text-lg font-medium text-gray-700">
+              <Label
+                htmlFor="password"
+                className="text-lg font-medium text-gray-700"
+              >
                 Password
               </Label>
               <Input
