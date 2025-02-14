@@ -47,8 +47,10 @@ export function Navbar() {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
-          <Button variant="outline">Log in</Button>
-          <Link href="/signup">
+          <Link href="/driver/signin">
+            <Button variant="outline">Log in</Button>
+          </Link>
+          <Link href="/driver/signup">
             <Button className="w-full">Sign up</Button>
           </Link>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +10,12 @@ import { Progress } from "@/components/ui/progress";
 import { SigninVector } from "@/components/svg-vector/signin-vector";
 import { Icons } from "@/components/icon";
 
+const mockUsers = [{ email: "driver@example.com", password: "password123" }];
+
 export default function SigninPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -18,8 +23,16 @@ export default function SigninPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("%cForm Data (For Backend API):", "color: blue; font-weight: bold;");
-    console.log(JSON.stringify(formData, null, 2));
+    const userExists = mockUsers.find(
+      (user) => user.email === formData.email && user.password === formData.password
+    );
+
+    if (userExists) {
+      console.log("Login successful");
+      router.push("/driver-dashboard");
+    } else {
+      setError("Invalid email or password");
+    }
   };
 
   return (
@@ -70,6 +83,7 @@ export default function SigninPage() {
               />
             </motion.div>
           </AnimatePresence>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
           <div className="flex justify-end pt-4">
             <Button type="submit">Sign In</Button>
           </div>
