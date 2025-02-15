@@ -90,6 +90,25 @@ export const carrierSignupData = {
       ],
     },
     {
+      id: 'password',
+      label: '🔒 Create a strong **password** for your account',
+      highlight: ['password'],
+      type: 'password',
+      required: true,
+      validation: [
+        {
+          minLength: 8,
+          message: 'Password must be at least 8 characters long',
+        },
+        {
+          pattern:
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{8,}$/,
+          message:
+            'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+        },
+      ],
+    },
+    {
       id: 'representative_phone',
       label: '📞 Your rep’s **phone number**?',
       highlight: ['phone number'],

@@ -9,7 +9,7 @@ import { usePathname } from 'next/navigation';
 
 export default function AuthHeader() {
   const pathname = usePathname();
-  const isSignInPage = pathname?.includes('/signin');
+  const isSignInPage = pathname?.includes('/carrier/signin');
 
   return (
     <div className="relative flex items-center gap-2 justify-between">
@@ -23,7 +23,7 @@ export default function AuthHeader() {
       />
       <Button variant="outline" size="sm" asChild>
         <Link
-          href={isSignInPage ? '/signup/carrier' : '/signin/carrier'}
+          href={isSignInPage ? '/carrier/signup' : '/carrier/signin'}
           className="font-medium"
         >
           {isSignInPage ? 'Sign Up' : 'Sign In'}

@@ -1,7 +1,16 @@
-import { CarrierSignupField } from '@/constants/carrier-signup';
+export interface ValidationField {
+  id: string;
+  required?: boolean;
+  validation?: {
+    pattern?: RegExp;
+    minLength?: number;
+    maxLength?: number;
+    message: string;
+  }[];
+}
 
 export function validateField(
-  field: CarrierSignupField,
+  field: ValidationField,
   value: string
 ): string | null {
   if (field.required && !value) {
