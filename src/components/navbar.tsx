@@ -1,17 +1,18 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
-import Image from "next/image";
+import { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Menu, X } from 'lucide-react';
+import Image from 'next/image';
 
 const navigation = [
-  { name: "Home", href: "/" },
-  { name: "About Us", href: "/about-us" },
-  { name: "Driver Resources", href: "/resources" },
-  { name: "Live Board", href: "/board" },
-  { name: "Contact Us", href: "/contact-us" },
+  { name: 'Home', href: '/' },
+  { name: 'About Us', href: '/about-us' },
+  { name: 'Driver Resources', href: '/resources' },
+  { name: 'Live Board', href: '/board' },
+  { name: 'Contact Us', href: '/contact-us' },
+  { name: 'For Carriers', href: '/carrier/signin', underline: true },
 ];
 
 export function Navbar() {
@@ -22,7 +23,12 @@ export function Navbar() {
       <nav className=" flex items-center justify-between" aria-label="Global">
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5 text-2xl font-bold">
-            <Image src="/uploads/driveboard_logo.png" alt="logo" width={100} height={100} />
+            <Image
+              src="/uploads/driveboard_logo.png"
+              alt="logo"
+              width={100}
+              height={100}
+            />
           </Link>
         </div>
         <div className="flex lg:hidden">
@@ -40,13 +46,15 @@ export function Navbar() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-base font-normal leading-6 text-gray-900 hover:text-gray-600"
+              className={`text-base font-normal leading-6 text-gray-900 hover:text-gray-600 hidden lg:block ${
+                item.underline ? 'underline' : ''
+              }`}
             >
               {item.name}
             </Link>
           ))}
         </div>
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4 items-center">
           <Link href="/driver/signin">
             <Button variant="outline">Log in</Button>
           </Link>
@@ -57,7 +65,11 @@ export function Navbar() {
       </nav>
 
       {/* Mobile menu */}
-      <div className={`lg:hidden ${mobileMenuOpen ? "fixed inset-0 z-50" : "hidden"}`}>
+      <div
+        className={`lg:hidden ${
+          mobileMenuOpen ? 'fixed inset-0 z-50' : 'hidden'
+        }`}
+      >
         <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
             <Link href="/" className="-m-1.5 p-1.5 text-2xl font-bold">
