@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { tablePostSchema } from '../schema/postSchema';
+import { tableJobPostSchema } from '../schema/jobPostSchema';
 
-export interface PostFormProps {
+export interface JobPostFormProps {
   setShowDialog: React.Dispatch<React.SetStateAction<boolean>>;
-  post?: z.infer<typeof tablePostSchema>;
+  post?: z.infer<typeof tableJobPostSchema>;
 }
