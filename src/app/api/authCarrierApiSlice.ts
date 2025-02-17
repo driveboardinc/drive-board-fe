@@ -1,7 +1,7 @@
 import { API_ENDPOINT } from '@/constants/API_ENDPOINT';
 import { apiSlice } from './apiSlice';
 
-const authPath = API_ENDPOINT.SIGNUP.PATH;
+const authPath = `${API_ENDPOINT.SIGNUP.PATH}/`;
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
