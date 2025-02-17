@@ -24,25 +24,6 @@ export default function AuthLayout({
 
       {/* Right Column - Content */}
       <div className="flex flex-col justify-between flex-1 p-4 sm:p-6 md:p-12 w-full md:w-1/2">
-        {/* <div className="relative flex items-center gap-2 justify-between">
-          <Image
-            src={companyLogo}
-            alt="Company logo"
-            width={800}
-            height={600}
-            className="object-contain w-24 sm:w-32 hover:scale-105 transition-transform"
-            priority
-          />
-          <Button variant="outline" size="sm" asChild>
-            <Link
-              href={isSignInPage ? '/signup/carrier' : '/signin/carrier'}
-              className="font-medium"
-            >
-              {isSignInPage ? 'Sign Up' : 'Sign In'}
-            </Link>
-          </Button>
-        </div> */}
-
         {children}
       </div>
     </div>

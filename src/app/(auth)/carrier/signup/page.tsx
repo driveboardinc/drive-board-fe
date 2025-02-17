@@ -1,10 +1,15 @@
 "use client";
 
+import { redirect } from "next/navigation";
+import ROUTE from "@/constants/ROUTE";
+import { useCarrierSignupMutation } from "@/app/api/authCarrierApiSlice";
+import { useToast } from "@/hooks/useToast";
+import { Error } from "@/interface/IErrorType";
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { carrierSignupData } from "@/constants/carrier-signup";
+import { carrierSignupData } from "@/constants/CARRIER_SIGNUP";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -14,9 +19,11 @@ import { splitWords } from "@/lib/text-utils";
 import AuthHeader from "@/components/auth/AuthHeader";
 
 export default function CarrierSignupPage() {
+  const toast = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [carrierSignup] = useCarrierSignupMutation();
 
   const currentField = carrierSignupData.fields[currentStep];
   const totalSteps = carrierSignupData.fields.length;
@@ -34,8 +41,13 @@ export default function CarrierSignupPage() {
     }));
   };
 
-  // Add handleSubmit function
-  const handleSubmit = () => {
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const handleSubmit = async () => {
     const error = validateField(currentField, formData[currentField.id] || "");
 
     if (error) {
@@ -45,7 +57,27 @@ export default function CarrierSignupPage() {
       }));
       return;
     }
-    // Here you can add your API call or further processing
+
+    try {
+      const response = await carrierSignup({
+        ...formData,
+        is_carrier: true,
+      }).unwrap();
+      if (response.email) {
+        toast.success({
+          title: "Signup successful",
+          description: "You have successfully signed up",
+        });
+        redirect(ROUTE.CARRIER.SIGNIN);
+      }
+    } catch (error: unknown) {
+      if ((error as Error).originalStatus === 403) {
+        toast.error({
+          title: "Signup failed",
+          description: "Something went wrong. Please try again.",
+        });
+      }
+    }
   };
 
   const handleNext = () => {
@@ -63,12 +95,6 @@ export default function CarrierSignupPage() {
       setCurrentStep((prev) => prev + 1);
     } else {
       handleSubmit();
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
     }
   };
 
@@ -129,6 +155,35 @@ export default function CarrierSignupPage() {
                     {currentField.label.split(/\*\*(.*?)\*\*/g).map((part, index) =>
                       index % 2 === 1 ? (
                         <span key={index} className="text-primary">
+                          {splitWords(part).map((word, wordIndex) =>
+                            word.trim() ? (
+                              <motion.span key={wordIndex} variants={childAnimation} className="inline-block">
+                                {word.replace(/_/g, " ")}
+                              </motion.span>
+                            ) : (
+                              <span key={wordIndex}>{word}</span>
+                            )
+                          )}
+                        </span>
+                      ) : (
+                        splitWords(part).map((word, wordIndex) =>
+                          word.trim() || word === "_" ? (
+                            <motion.span
+                              key={`${index}-${wordIndex}`}
+                              variants={childAnimation}
+                              className="inline-block"
+                            >
+                              {word}
+                            </motion.span>
+                          ) : (
+                            <span key={`${index}-${wordIndex}`}>{word}</span>
+                          )
+                        )
+                      )
+                    )}
+                    {currentField.label.split(/\*\*(.*?)\*\*/g).map((part, index) =>
+                      index % 2 === 1 ? (
+                        <span key={index} className="text-custom-purple">
                           {splitWords(part).map((word, wordIndex) =>
                             word.trim() ? (
                               <motion.span key={wordIndex} variants={childAnimation} className="inline-block">

@@ -1,4 +1,4 @@
-const ROOT_API = '/api';
+const ROOT_API = process.env.NEXT_PUBLIC_API_URL;
 
 const API_ENDPOINT = {
   JOB_POSTS: {
@@ -10,6 +10,12 @@ const API_ENDPOINT = {
 
     ID: '/:id',
     SLUG: '/slug/:slug',
+  },
+  SIGNUP: {
+    PATH: `${ROOT_API}/api/signup`,
+  },
+  SIGNIN: {
+    PATH: `${ROOT_API}/api/signin`,
   },
 };
 

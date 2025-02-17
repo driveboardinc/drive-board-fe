@@ -14,7 +14,7 @@ import {
 import { DataTableFacetedFilter } from '@/components/common/DataTableFacetedFilter';
 import { DataTableViewOptions } from '@/components/common/DataTableViewOptions';
 import { facetConfig, postFilterConfig } from './PostTableConfig';
-import { PostForm } from './PostForm';
+import { JobPostForm } from './JobPostForm';
 import { debounce } from '@/lib/debounce';
 import { AddEntityButton } from '@/components/ui/AddEntityButton';
 
@@ -101,10 +101,10 @@ export function PostTableToolbar<TData>({
         <div className="flex flex-col md:flex-row gap-2">
           <DataTableViewOptions table={table} />
           <AddEntityButton
-            FormComponent={PostForm}
-            buttonLabel="Add Post"
-            dialogTitle="Add Post"
-            dialogDescription="Add the post details below by changing values."
+            FormComponent={JobPostForm}
+            buttonLabel="Add Job Post"
+            dialogTitle="Add Job Post"
+            dialogDescription="Add the job post details below by changing values."
           />
         </div>
       </div>
