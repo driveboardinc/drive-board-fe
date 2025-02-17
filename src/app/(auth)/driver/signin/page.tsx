@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,30 +9,44 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { SigninVector } from "@/components/svg-vector/signin-vector";
 import { Icons } from "@/components/icon";
-
-const mockUsers = [{ email: "driver@example.com", password: "password123" }];
+import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "@/store/store";
+import { signin } from "@/store/authSlice";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useRouter } from "next/navigation";
 
 export default function SigninPage() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "", userType: "driver" });
+  const error = useSelector((state: RootState) => state.auth.error);
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/driver-dashboard");
+    }
+  }, [isAuthenticated, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const userExists = mockUsers.find(
-      (user) => user.email === formData.email && user.password === formData.password
-    );
+  const handleUserTypeChange = (value: string) => {
+    setFormData({ ...formData, userType: value });
+    router.push(value === "driver" ? "/driver/signin" : "/carrier/signin");
+  };
 
-    if (userExists) {
-      console.log("Login successful");
-      router.push("/driver-dashboard");
-    } else {
-      setError("Invalid email or password");
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    dispatch(
+      signin({
+        email: formData.email,
+        password: formData.password,
+        userType: formData.userType,
+      })
+    );
   };
 
   return (
@@ -56,6 +70,19 @@ export default function SigninPage() {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
+              <Label htmlFor="userType" className="text-lg font-medium text-gray-700">
+                I am a:
+              </Label>
+              <Select defaultValue="driver" onValueChange={handleUserTypeChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select user type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="driver">Driver</SelectItem>
+                  <SelectItem value="carrier">Carrier</SelectItem>
+                </SelectContent>
+              </Select>
+
               <Label htmlFor="email" className="text-lg font-medium text-gray-700">
                 Email Address
               </Label>
@@ -88,6 +115,17 @@ export default function SigninPage() {
             <Button type="submit">Sign In</Button>
           </div>
         </form>
+        <div className="mt-6">
+          <p className="text-sm text-gray-600">
+            Don&apos;t have an account?{" "}
+            <Link
+              href={formData.userType === "driver" ? "/driver/signup" : "/carrier/signup"}
+              className="text-custom-purple font-semibold hover:underline"
+            >
+              Sign up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
