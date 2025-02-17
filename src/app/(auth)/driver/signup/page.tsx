@@ -46,11 +46,30 @@ export default function SignupPage() {
     setFormData({ ...formData, [id]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("%cForm Data (For Backend API):", "color: blue; font-weight: bold;");
-    console.log(JSON.stringify(formData, null, 2));
+    const apiEndpoint = "http://ec2-3-85-162-187.compute-1.amazonaws.com:8000/api/driver/profile/";
+    const token = localStorage.getItem("authToken"); // If authentication is needed
+
+    try {
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "", // If required
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const responseText = await response.text(); // Get raw response
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${responseText}`);
+      }
+    } catch (error) {
+      console.error("%cFailed to submit form:", "color: red; font-weight: bold;", error);
+    }
   };
 
   return (
