@@ -1,38 +1,46 @@
-'use client';
+"use client";
 
-import { redirect } from 'next/navigation';
-import ROUTE from '@/constants/ROUTE';
-import { useCarrierSignupMutation } from '@/app/api/authCarrierApiSlice';
-import { useToast } from '@/hooks/useToast';
-import { Error } from '@/interface/IErrorType';
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { carrierSignupData } from '@/constants/CARRIER_SIGNUP';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { validateField } from '@/lib/form-validation';
-import { containerAnimation, childAnimation } from '@/lib/animations';
-import { splitWords } from '@/lib/text-utils';
-import AuthHeader from '@/components/auth/AuthHeader';
+import { redirect, useRouter } from "next/navigation";
+import ROUTE from "@/constants/ROUTE";
+import { useCarrierSignupMutation } from "@/app/api/authCarrierApiSlice";
+import { useToast } from "@/hooks/useToast";
+import { Error } from "@/interface/IErrorType";
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { carrierSignupData } from "@/constants/CARRIER_SIGNUP";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { validateField } from "@/lib/form-validation";
+import { containerAnimation, childAnimation } from "@/lib/animations";
+import { splitWords } from "@/lib/text-utils";
+import AuthHeader from "@/components/auth/AuthHeader";
 
 export default function CarrierSignupPage() {
+  const router = useRouter();
   const toast = useToast();
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<Record<string, string>>({
+    userType: "carrier",
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [carrierSignup] = useCarrierSignupMutation();
 
-  const currentField = carrierSignupData.fields[currentStep];
-  const totalSteps = carrierSignupData.fields.length;
+  const userTypeField = {
+    id: "userType",
+    type: "select",
+    label: "I am signing up as a:",
+    emoji: "👤",
+    required: true,
+    options: ["driver", "carrier"],
+    highlight: ["user type"],
+  };
+
+  const allFields = [userTypeField, ...carrierSignupData.fields];
+  const currentField = allFields[currentStep];
+  const totalSteps = allFields.length;
 
   const handleInputChange = (value: string) => {
     setFormData((prev) => ({
@@ -40,10 +48,14 @@ export default function CarrierSignupPage() {
       [currentField.id]: value,
     }));
 
+    if (currentField.id === "userType") {
+      router.push(value === "driver" ? "/driver/signup" : "/carrier/signup");
+    }
+
     const error = validateField(currentField, value);
     setErrors((prev) => ({
       ...prev,
-      [currentField.id]: error || '',
+      [currentField.id]: error || "",
     }));
   };
 
@@ -54,7 +66,7 @@ export default function CarrierSignupPage() {
   };
 
   const handleSubmit = async () => {
-    const error = validateField(currentField, formData[currentField.id] || '');
+    const error = validateField(currentField, formData[currentField.id] || "");
 
     if (error) {
       setErrors((prev) => ({
@@ -71,23 +83,23 @@ export default function CarrierSignupPage() {
       }).unwrap();
       if (response.email) {
         toast.success({
-          title: 'Signup successful',
-          description: 'You have successfully signed up',
+          title: "Signup successful",
+          description: "You have successfully signed up",
         });
         redirect(ROUTE.CARRIER.SIGNIN);
       }
     } catch (error: unknown) {
       if ((error as Error).originalStatus === 403) {
         toast.error({
-          title: 'Signup failed',
-          description: 'Something went wrong. Please try again.',
+          title: "Signup failed",
+          description: "Something went wrong. Please try again.",
         });
       }
     }
   };
 
   const handleNext = () => {
-    const error = validateField(currentField, formData[currentField.id] || '');
+    const error = validateField(currentField, formData[currentField.id] || "");
 
     if (error) {
       setErrors((prev) => ({
@@ -105,8 +117,8 @@ export default function CarrierSignupPage() {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      const currentValue = formData[currentField.id] || '';
+    if (e.key === "Enter") {
+      const currentValue = formData[currentField.id] || "";
       const error = validateField(currentField, currentValue);
 
       if (currentValue && !error) {
@@ -155,69 +167,51 @@ export default function CarrierSignupPage() {
                     animate="visible"
                     className="text-3xl md:text-4xl lg:text-5xl leading-tight md:leading-tight lg:leading-tight"
                   >
-                    <motion.span
-                      variants={childAnimation}
-                      className="inline-block"
-                    >
-                      {currentField.emoji}{' '}
+                    <motion.span variants={childAnimation} className="inline-block">
+                      {currentField.emoji}{" "}
                     </motion.span>
 
-                    {currentField.label
-                      .split(/\*\*(.*?)\*\*/g)
-                      .map((part, index) =>
-                        index % 2 === 1 ? (
-                          <span key={index} className="text-custom-purple">
-                            {splitWords(part).map((word, wordIndex) =>
-                              word.trim() ? (
-                                <motion.span
-                                  key={wordIndex}
-                                  variants={childAnimation}
-                                  className="inline-block"
-                                >
-                                  {word.replace(/_/g, ' ')}
-                                </motion.span>
-                              ) : (
-                                <span key={wordIndex}>{word}</span>
-                              )
-                            )}
-                          </span>
-                        ) : (
-                          splitWords(part).map((word, wordIndex) =>
-                            word.trim() || word === '_' ? (
-                              <motion.span
-                                key={`${index}-${wordIndex}`}
-                                variants={childAnimation}
-                                className="inline-block"
-                              >
-                                {word}
+                    {currentField.label.split(/\*\*(.*?)\*\*/g).map((part, index) =>
+                      index % 2 === 1 ? (
+                        <span key={index} className="text-custom-purple">
+                          {splitWords(part).map((word, wordIndex) =>
+                            word.trim() ? (
+                              <motion.span key={wordIndex} variants={childAnimation} className="inline-block">
+                                {word.replace(/_/g, " ")}
                               </motion.span>
                             ) : (
-                              <span key={`${index}-${wordIndex}`}>{word}</span>
+                              <span key={wordIndex}>{word}</span>
                             )
+                          )}
+                        </span>
+                      ) : (
+                        splitWords(part).map((word, wordIndex) =>
+                          word.trim() || word === "_" ? (
+                            <motion.span
+                              key={`${index}-${wordIndex}`}
+                              variants={childAnimation}
+                              className="inline-block"
+                            >
+                              {word}
+                            </motion.span>
+                          ) : (
+                            <span key={`${index}-${wordIndex}`}>{word}</span>
                           )
                         )
-                      )}
+                      )
+                    )}
                     {currentField.required && (
-                      <motion.span
-                        variants={childAnimation}
-                        className="text-destructive ml-2 inline-block"
-                      >
+                      <motion.span variants={childAnimation} className="text-destructive ml-2 inline-block">
                         *
                       </motion.span>
                     )}
                   </motion.p>
                 </div>
                 <div className=" w-full">
-                  {currentField.type === 'select' ? (
-                    <Select
-                      value={formData[currentField.id]}
-                      onValueChange={handleInputChange}
-                    >
+                  {currentField.type === "select" ? (
+                    <Select value={formData[currentField.id]} onValueChange={handleInputChange}>
                       <SelectTrigger
-                        className={cn(
-                          'h-12',
-                          errors[currentField.id] && 'border-destructive'
-                        )}
+                        className={cn("h-12", errors[currentField.id] && "border-destructive")}
                         onKeyDown={handleKeyPress}
                       >
                         <SelectValue placeholder="Select an option" />
@@ -232,12 +226,9 @@ export default function CarrierSignupPage() {
                     </Select>
                   ) : (
                     <Input
-                      className={cn(
-                        'w-full h-12',
-                        errors[currentField.id] && 'border-destructive'
-                      )}
+                      className={cn("w-full h-12", errors[currentField.id] && "border-destructive")}
                       type={currentField.type}
-                      value={formData[currentField.id] || ''}
+                      value={formData[currentField.id] || ""}
                       onChange={(e) => handleInputChange(e.target.value)}
                       onKeyDown={handleKeyPress}
                       placeholder={`Enter ${currentField.highlight[0]}`}
@@ -271,16 +262,13 @@ export default function CarrierSignupPage() {
                   className="w-full"
                 >
                   <motion.div variants={childAnimation}>
-                    <Button
-                      onClick={handleNext}
-                      className="px-10 h-10 w-full md:w-auto"
-                    >
+                    <Button onClick={handleNext} className="px-10 h-10 w-full md:w-auto">
                       <motion.div
                         className="flex items-center gap-2"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        {currentStep === totalSteps - 1 ? 'Submit' : 'Next'}
+                        {currentStep === totalSteps - 1 ? "Submit" : "Next"}
                         <motion.span
                           initial={{ x: 0 }}
                           whileHover={{ x: 4 }}
@@ -302,9 +290,7 @@ export default function CarrierSignupPage() {
               <span>
                 Step {currentStep + 1} of {totalSteps}
               </span>
-              <span className="text-primary">
-                {Math.round(((currentStep + 1) / totalSteps) * 100)}%
-              </span>
+              <span className="text-primary">{Math.round(((currentStep + 1) / totalSteps) * 100)}%</span>
             </div>
             <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
               <motion.div
@@ -313,12 +299,12 @@ export default function CarrierSignupPage() {
                 animate={{
                   width: `${((currentStep + 1) / totalSteps) * 100}%`,
                 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
               />
             </div>
           </div>
-        </div>{' '}
-      </div>{' '}
+        </div>{" "}
+      </div>{" "}
     </div>
   );
 }

@@ -13,6 +13,7 @@ export interface FormData {
 
 export const questions: Question[] = [
   { id: "first_name", label: "What's your first name?", type: "text", placeholder: "John" },
+  { id: "first_name", label: "What's your first name?", type: "text", placeholder: "John" },
   { id: "last_name", label: "And your last name?", type: "text", placeholder: "Doe" },
   { id: "email", label: "What's your email address?", type: "email", placeholder: "johndoe@example.com" },
   { id: "password", label: "Create a password", type: "password", placeholder: "Enter a strong password" },

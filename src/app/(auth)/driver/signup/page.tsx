@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,11 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ArrowRight, Check, Truck } from "lucide-react";
 import { questions, type Question, type FormData } from "@/constants/questions";
 import { SignupVector } from "@/components/svg-vector/signup-vector";
+import Link from "next/link";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store/store";
+import { signup } from "@/store/authSlice";
+import { useRouter } from "next/navigation";
 
 const getVisibleQuestions = (questions: Question[], formData: FormData) => {
   return questions.filter((question) => {
@@ -20,7 +26,9 @@ const getVisibleQuestions = (questions: Question[], formData: FormData) => {
 
 export default function SignupPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [formData, setFormData] = useState<FormData>({});
+  const [formData, setFormData] = useState<FormData>({ userType: "driver" });
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
 
   const visibleQuestions = getVisibleQuestions(questions, formData);
   const question = visibleQuestions[currentQuestion];
@@ -46,30 +54,20 @@ export default function SignupPage() {
     setFormData({ ...formData, [id]: value });
   };
 
+  const handleUserTypeChange = (value: string) => {
+    setFormData({ ...formData, userType: value });
+    router.push(value === "driver" ? "/driver/signup" : "/carrier/signup");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const apiEndpoint = "http://ec2-3-85-162-187.compute-1.amazonaws.com:8000/api/driver/profile/";
-    const token = localStorage.getItem("authToken"); // If authentication is needed
-
-    try {
-      const response = await fetch(apiEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "", // If required
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const responseText = await response.text(); // Get raw response
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${responseText}`);
-      }
-    } catch (error) {
-      console.error("%cFailed to submit form:", "color: red; font-weight: bold;", error);
-    }
+    dispatch(
+      signup({
+        email: formData.email,
+        password: formData.password,
+        userType: formData.userType,
+      })
+    );
   };
 
   return (
@@ -94,32 +92,52 @@ export default function SignupPage() {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
-              <Label htmlFor={question.id} className="text-lg font-medium text-gray-700">
-                {question.label}
-              </Label>
-              {question.type === "select" ? (
-                <Select onValueChange={(value) => handleSelectChange(value, question.id)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={question.placeholder} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {question.options?.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  id={question.id}
-                  type={question.type}
-                  onChange={handleInputChange}
-                  value={formData[question.id] || ""}
-                  placeholder={question.placeholder}
-                  required
-                  className="w-full h-12"
-                />
+              {currentQuestion === 0 && (
+                <>
+                  <Label htmlFor="userType" className="text-lg font-medium text-gray-700">
+                    I am signing up as a:
+                  </Label>
+                  <Select defaultValue="driver" onValueChange={handleUserTypeChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select user type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="driver">Driver</SelectItem>
+                      <SelectItem value="carrier">Carrier</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </>
+              )}
+              {currentQuestion > 0 && (
+                <>
+                  <Label htmlFor={question.id} className="text-lg font-medium text-gray-700">
+                    {question.label}
+                  </Label>
+                  {question.type === "select" ? (
+                    <Select onValueChange={(value) => handleSelectChange(value, question.id)}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder={question.placeholder} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {question.options?.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      id={question.id}
+                      type={question.type}
+                      onChange={handleInputChange}
+                      value={formData[question.id] || ""}
+                      placeholder={question.placeholder}
+                      required
+                      className="w-full h-12"
+                    />
+                  )}
+                </>
               )}
             </motion.div>
           </AnimatePresence>
@@ -144,6 +162,17 @@ export default function SignupPage() {
             )}
           </div>
         </form>
+        <div className="mt-6 ">
+          <p className="text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link
+              href={formData.userType === "driver" ? "/driver/signin" : "/carrier/signin"}
+              className="text-custom-purple font-semibold hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
