@@ -166,17 +166,22 @@ export const {
 export default tablePaginationSlice.reducer;
 
 export const getPagination = (state: { pageDetails: PaginationState }) =>
-  state.pageDetails.pagination;
+  state?.pageDetails?.pagination || initialState.pagination;
+
 export const getTotalPageCount = (state: { pageDetails: PaginationState }) =>
-  state.pageDetails.pageCount;
+  state?.pageDetails?.pageCount || initialState.pageCount;
+
 export const getTotalRecords = (state: { pageDetails: PaginationState }) =>
-  state.pageDetails.totalRecords;
+  state?.pageDetails?.totalRecords || initialState.totalRecords;
+
 export const getFilters = (state: { pageDetails: PaginationState }) =>
-  state.pageDetails.filters;
+  state?.pageDetails?.filters || initialState.filters;
+
 export const getSorting = (state: { pageDetails: PaginationState }) =>
-  state.pageDetails.sorting;
+  state?.pageDetails?.sorting || initialState.sorting;
+
 export const getRefetchStatus = (state: { pageDetails: PaginationState }) =>
-  state.pageDetails.refetchData;
+  state?.pageDetails?.refetchData || initialState.refetchData;
 
 export const getIsLoading = (state: { pageDetails: PaginationState }) =>
-  state.pageDetails.isLoading;
+  state?.pageDetails?.isLoading || initialState.isLoading;
