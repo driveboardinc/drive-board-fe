@@ -33,6 +33,8 @@ export function DriverDashboardContent() {
         setSelectedJob(mock_jobs[0]);
       }
       setIsLoading(false);
+
+      console.log(JSON.stringify(mock_jobs, null, 2));
     };
 
     fetchJobs();
@@ -54,6 +56,30 @@ export function DriverDashboardContent() {
     setIsMobileDetailOpen(true);
   };
 
+  const sendJobsToBackend = async () => {
+    try {
+      const response = await fetch("https://your-backend-api.com/jobs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(mock_jobs),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log("Success:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // Tawagan ang function na ito kung kinakailangan
+  sendJobsToBackend();
+
   return (
     <>
       <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#1E2330]">Driver Dashboard</h1>
@@ -70,7 +96,7 @@ export function DriverDashboardContent() {
       <div className="mt-6">
         <h2 className="text-xl md:text-2xl font-semibold mb-4 text-[#1E2330]">Available Job Postings</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ScrollArea className="h-[600px] md:h-[700px]">
+          <ScrollArea className="h-[700px]">
             <div className="space-y-4 pr-4">
               {filteredJobs.map((job) => (
                 <JobCard

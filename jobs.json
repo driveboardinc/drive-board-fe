@@ -1,0 +1,32 @@
+{
+  "id": "1",
+  "title": "Long Haul Truck Driver",
+  "description": "We are seeking experienced long haul truck drivers to join our team. You will be responsible for transporting goods across long distances, ensuring timely delivery and maintaining a safe driving record.",
+  "carrier": {
+    "name": "Swift Transportation"
+  },
+  "location": "Phoenix, AZ",
+  "salary": 65000,
+  "job_type": [
+    "Full-time"
+  ],
+  "status": "active",
+  "posted_at": "2 days ago",
+  "num_openings": 1,
+  "country": "USA",
+  "language": "English",
+  "shift": "Day",
+  "day_range": "Monday to Friday",
+  "experience_level": "Entry",
+  "benefits": [
+    "Health Insurance",
+    "401k"
+  ],
+  "job_description": "Detailed job description here.",
+  "customized_pre_screening": [],
+  "qualifications": [
+    "Valid CDL",
+    "Clean driving record"
+  ],
+  "application_method": "Direct"
+}
