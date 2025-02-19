@@ -33,15 +33,15 @@ export function Menu({ isOpen }: MenuProps) {
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
-      <div className="mt-8 h-auto w-full">
+      <div className=" h-auto w-full">
         <ul className="flex flex-col h-auto items-start space-y-1 px-2">
           {menuList.map(({ groupLabel, menus }, index) => (
-            <li className={cn('w-full', groupLabel ? 'pt-5' : '')} key={index}>
+            <li className={cn('w-full', groupLabel ? 'pt-2' : '')} key={index}>
               <SidebarGroup>
                 {groupLabel && (
                   <>
                     {isOpen || isOpen === undefined ? (
-                      <SidebarGroupLabel className="px-4 pb-2">
+                      <SidebarGroupLabel className="px-2 pb-2">
                         {groupLabel}
                       </SidebarGroupLabel>
                     ) : (

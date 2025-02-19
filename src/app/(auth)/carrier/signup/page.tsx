@@ -224,6 +224,17 @@ export default function CarrierSignupPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                  ) : currentField.type === 'datetime-local' ? (
+                    <Input
+                      className={cn(
+                        'w-full h-12',
+                        errors[currentField.id] && 'border-destructive'
+                      )}
+                      type="datetime-local"
+                      value={formData[currentField.id] || ''}
+                      onChange={(e) => handleInputChange(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                    />
                   ) : (
                     <Input
                       className={cn("w-full h-12", errors[currentField.id] && "border-destructive")}

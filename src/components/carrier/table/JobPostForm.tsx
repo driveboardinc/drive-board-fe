@@ -36,7 +36,9 @@ import {
   jobTypeOptions,
   shiftOptions,
   experienceLevelOptions,
-  applicationMethodOptions,
+  payTypeOptions,
+  payRateOptions,
+  benefitsOptions,
 } from '@/schema/jobPostSchema';
 
 export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
@@ -47,25 +49,25 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
     resolver: zodResolver(jobPostSchema),
     defaultValues: {
       job_title: post?.job_title ?? '',
-      company_for_this_job: post?.company_for_this_job ?? '',
       num_openings: post?.num_openings ?? 1,
-      country: post?.country ?? '',
-      language: post?.language ?? '',
       location: post?.location ?? '',
       job_type: post?.job_type ? [post.job_type] : ['Full-time'],
       shift: post?.shift ?? 'Day',
       day_range: post?.day_range ?? '',
-      pay: post?.pay ?? '',
+      pay: post?.pay ?? {
+        type: 'Range',
+        minimum: 0,
+        maximum: 0,
+        rate: 'per hour',
+      },
       experience_level: post?.experience_level ?? 'Entry',
       benefits: post?.benefits ?? [],
       job_description: post?.job_description ?? '',
       customized_pre_screening: post?.customized_pre_screening ?? [],
       qualifications: post?.qualifications ?? [],
-      application_method: post?.application_method ?? 'Direct',
       required_resume: post?.required_resume ?? true,
-      application_updates: post?.application_updates ?? true,
+      application_updates: post?.application_updates ?? '',
       candidates_contact_you: post?.candidates_contact_you ?? true,
-      fair_chance_hiring: post?.fair_chance_hiring ?? false,
       background_check: post?.background_check ?? false,
     },
   });
@@ -150,20 +152,6 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
 
           <FormField
             control={form.control}
-            name="company_for_this_job"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Company Name</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Enter company name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="num_openings"
             render={({ field }) => (
               <FormItem>
@@ -180,36 +168,6 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               </FormItem>
             )}
           />
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter country" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="language"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Language</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter language" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
           <FormField
             control={form.control}
@@ -297,19 +255,137 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="pay"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Pay Information</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Enter pay details" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="pay.type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select payment type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {payTypeOptions.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {form.watch('pay.type') === 'Range' ? (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="pay.minimum"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Minimum Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                            placeholder="Enter minimum amount"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="pay.maximum"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Maximum Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                            placeholder="Enter maximum amount"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </>
+            ) : (
+              ['Starting Amount', 'Maximum Amount', 'Exact Amount'].includes(
+                form.watch('pay.type')
+              ) && (
+                <FormField
+                  control={form.control}
+                  name="pay.amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                          placeholder={`Enter ${form
+                            .watch('pay.type')
+                            .toLowerCase()}`}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )
             )}
-          />
+
+            <FormField
+              control={form.control}
+              name="pay.rate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pay Rate</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select pay rate" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {payRateOptions.map((rate) => (
+                        <SelectItem key={rate} value={rate}>
+                          {rate}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}
@@ -339,6 +415,39 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
             )}
           />
 
+          {/* Benefits */}
+          <FormField
+            control={form.control}
+            name="benefits"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Benefits</FormLabel>
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                  {benefitsOptions.map((benefit) => (
+                    <div key={benefit} className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={field.value?.includes(benefit)}
+                        onCheckedChange={(checked) => {
+                          const currentValues = field.value || [];
+                          const newValues = checked
+                            ? [...currentValues, benefit]
+                            : currentValues.filter(
+                                (value) => value !== benefit
+                              );
+                          field.onChange(newValues);
+                        }}
+                      />
+                      <label className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        {benefit}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="job_description"
@@ -356,38 +465,29 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               </FormItem>
             )}
           />
+        </div>
 
+        {/* Benefits */}
+
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold">Settings</h2>
           <FormField
             control={form.control}
-            name="application_method"
+            name="application_updates"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Application Method</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select application method" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {applicationMethodOptions.map((method) => (
-                      <SelectItem key={method} value={method}>
-                        {method}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormLabel>Application Updates Email</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="email"
+                    placeholder="Enter email for application updates"
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold">Settings</h2>
 
           <FormField
             control={form.control}
@@ -407,42 +507,10 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
 
           <FormField
             control={form.control}
-            name="application_updates"
-            render={({ field }) => (
-              <FormItem className="flex items-center justify-between">
-                <FormLabel>Application Updates</FormLabel>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="candidates_contact_you"
             render={({ field }) => (
               <FormItem className="flex items-center justify-between">
                 <FormLabel>Allow Candidates to Contact You</FormLabel>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fair_chance_hiring"
-            render={({ field }) => (
-              <FormItem className="flex items-center justify-between">
-                <FormLabel>Fair Chance Hiring</FormLabel>
                 <FormControl>
                   <Switch
                     checked={field.value}

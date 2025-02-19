@@ -1,12 +1,9 @@
 'use client';
 import Image from 'next/image';
 import signupImage from '@/assets/images/signup.png';
+import { withAuthRedirect } from '@/components/auth/hocs/withAuthRedirect';
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex">
       {/* Left Column - Image */}
@@ -29,3 +26,5 @@ export default function AuthLayout({
     </div>
   );
 }
+
+export default withAuthRedirect(AuthLayout);
