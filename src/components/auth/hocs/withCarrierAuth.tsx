@@ -1,10 +1,11 @@
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import {
   selectCurrentUser,
   selectIsAuthenticated,
+  selectIsLoggingOut,
 } from '@/feature/slice/authSlice';
 
 export function withCarrierAuth<P extends object>(
@@ -13,8 +14,12 @@ export function withCarrierAuth<P extends object>(
   return function WithCarrierAuthComponent(props: P) {
     const isAuthenticated = useSelector(selectIsAuthenticated);
     const user = useSelector(selectCurrentUser);
+    const isLoggingOut = useSelector(selectIsLoggingOut);
 
     if (!isAuthenticated || !user?.is_carrier) {
+      if (isLoggingOut) {
+        redirect('/carrier/signin');
+      }
       notFound();
     }
 

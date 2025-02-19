@@ -16,11 +16,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Settings, LogOut } from 'lucide-react';
 import { withCarrierAuth } from '@/components/auth/hocs/withCarrierAuth';
+import { useDispatch } from 'react-redux';
+import { logout, setLoggingOut } from '@/feature/slice/authSlice';
 
 function CarrierLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
+    dispatch(setLoggingOut(true));
+    dispatch(logout());
     router.push('/carrier/signin');
   };
 

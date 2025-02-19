@@ -13,11 +13,13 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  isLoggingOut: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
+  isLoggingOut: false,
 };
 
 const authSlice = createSlice({
@@ -38,32 +40,34 @@ const authSlice = createSlice({
       }>
     ) => {
       const { access, refresh, user_id, ...userData } = action.payload;
-      console.log('USER DATA', userData);
       state.user = {
         id: user_id,
         ...userData,
       };
       state.isAuthenticated = true;
-      console.log('SETTING CREDENTIALS');
       // Set cookies for middleware
       setAuthCookies(access, refresh);
     },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
-
       // Clear cookies
       clearAuthCookies();
+    },
+    setLoggingOut: (state, action: PayloadAction<boolean>) => {
+      state.isLoggingOut = action.payload;
     },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, setLoggingOut } = authSlice.actions;
 
 // Selectors
 export const selectCurrentUser = (state: { auth: AuthState }) =>
   state.auth.user;
 export const selectIsAuthenticated = (state: { auth: AuthState }) =>
   state.auth.isAuthenticated;
+export const selectIsLoggingOut = (state: { auth: AuthState }) =>
+  state.auth.isLoggingOut;
 
 export default authSlice.reducer;
