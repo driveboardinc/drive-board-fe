@@ -22,4 +22,7 @@ export interface Job {
   customized_pre_screening: string[];
   qualifications: string[];
   application_method: string;
+  vehicle_type: string[];
 }
+
+export type SortOption = "date" | "pay" | "az" | "location";

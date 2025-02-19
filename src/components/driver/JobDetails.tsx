@@ -4,13 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { Job } from "@/types";
-import { MapPin, DollarSign, Calendar, Users, Globe, Languages, Clock, Sun, Briefcase } from "lucide-react";
+import {
+  MapPin,
+  DollarSign,
+  Calendar,
+  Users,
+  Globe,
+  Languages,
+  Clock,
+  Sun,
+  Briefcase,
+  Truck,
+} from "lucide-react";
 
 interface JobDetailsProps {
   job: Job;
 }
 
 export function JobDetails({ job }: JobDetailsProps) {
+  console.log(job);
+
   return (
     <Card className="bg-white border-[#D0DDE9] shadow-lg rounded-xl overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-[#6B5ECD] to-[#8677D9] text-white p-6">
@@ -46,6 +59,11 @@ export function JobDetails({ job }: JobDetailsProps) {
             icon={<Briefcase className="w-5 h-5" />}
             label="Experience"
             value={job.experience_level}
+          />
+          <InfoItem
+            icon={<Truck className="w-5 h-5" />}
+            label="Vehicle Type"
+            value={job.vehicle_type.join(", ")}
           />
         </div>
 
