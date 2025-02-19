@@ -12,11 +12,11 @@ import {
 } from '@/schema/carrierSchema';
 import { Error } from '@/interface/IErrorType';
 import ROUTE from '@/constants/ROUTE';
-import { useSignInMutation } from '@/app/api/authCarrierApiSlice';
+import { useSignInMutation } from '@/store/api/authCarrierApiSlice';
 import { useToast } from '@/hooks/useToast';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
-import { setCredentials } from '@/feature/slice/authSlice';
+import { setCredentials } from '@/store/slice/authSlice';
 
 export default function CarrierSignInPage() {
   const router = useRouter();

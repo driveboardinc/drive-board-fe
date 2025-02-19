@@ -27,7 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   useCreateJobPostMutation,
   useUpdateJobPostMutation,
-} from '@/app/api/jobPostApiSlice';
+} from '@/store/api/jobPostApiSlice';
 import { ErrorResponse } from '@/interface/IErrorType';
 import { JobPostFormProps } from '@/interface/IDialogFormType';
 import {

@@ -13,12 +13,14 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  error: string | null;
   isLoggingOut: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
+  error: null,
   isLoggingOut: false,
 };
 

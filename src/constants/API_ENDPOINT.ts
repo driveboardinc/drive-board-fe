@@ -11,11 +11,14 @@ const API_ENDPOINT = {
     ID: '/:id',
     SLUG: '/slug/:slug',
   },
-  CARRIER_SIGNUP: {
-    PATH: `/carrier/profile/create/`,
+  CARRIER: {
+    SIGNUP: `/carrier/profile/create/`,
+    SIGNIN: `/login/`,
   },
-  SIGNIN: {
-    PATH: `/login/`,
+
+  DRIVER: {
+    SIGNUP: `/driver/profile/create/`,
+    SIGNIN: `/login/`,
   },
 };
 

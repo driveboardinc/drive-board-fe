@@ -6,7 +6,7 @@ import {
   selectCurrentUser,
   selectIsAuthenticated,
   selectIsLoggingOut,
-} from '@/feature/slice/authSlice';
+} from '@/store/slice/authSlice';
 
 export function withCarrierAuth<P extends object>(
   WrappedComponent: React.ComponentType<P>

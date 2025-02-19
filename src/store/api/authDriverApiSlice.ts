@@ -3,11 +3,11 @@ import { apiSlice } from './apiSlice';
 
 const authPath = `${ROOT_API}`;
 
-export const authApiSlice = apiSlice.injectEndpoints({
+export const authDriverApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    carrierSignup: builder.mutation({
+    driverSignup: builder.mutation({
       query: (signupData) => ({
-        url: `${authPath}${API_ENDPOINT.CARRIER_SIGNUP.PATH}`,
+        url: `${authPath}${API_ENDPOINT.DRIVER.SIGNUP}`,
         method: 'POST',
         body: signupData,
       }),
@@ -15,7 +15,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
     signIn: builder.mutation({
       query: (credentials) => ({
-        url: `${authPath}${API_ENDPOINT.SIGNIN.PATH}`,
+        url: `${authPath}${API_ENDPOINT.DRIVER.SIGNIN}`,
         method: 'POST',
         body: credentials,
       }),
@@ -23,4 +23,5 @@ export const authApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useCarrierSignupMutation, useSignInMutation } = authApiSlice;
+export const { useDriverSignupMutation, useSignInMutation } =
+  authDriverApiSlice;

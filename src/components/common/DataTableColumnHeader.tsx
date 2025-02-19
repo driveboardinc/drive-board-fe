@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useDispatch, useSelector } from 'react-redux';
-import { getSorting, setSorting } from '@/feature/slice/paginationSlice';
+import { getSorting, setSorting } from '@/store/slice/paginationSlice';
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {

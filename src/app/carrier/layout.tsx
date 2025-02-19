@@ -17,7 +17,7 @@ import {
 import { Settings, LogOut } from 'lucide-react';
 import { withCarrierAuth } from '@/components/auth/hocs/withCarrierAuth';
 import { useDispatch } from 'react-redux';
-import { logout, setLoggingOut } from '@/feature/slice/authSlice';
+import { logout, setLoggingOut } from '@/store/slice/authSlice';
 
 function CarrierLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();

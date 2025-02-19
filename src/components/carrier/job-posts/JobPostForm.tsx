@@ -24,10 +24,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import {
-  useCreateJobPostMutation,
-  useUpdateJobPostMutation,
-} from '@/app/api/jobPostApiSlice';
+import { useCreateJobPostMutation } from '@/store/api/jobPostApiSlice';
 import type { ErrorResponse } from '@/interface/IErrorType';
 import {
   jobPostSchema,

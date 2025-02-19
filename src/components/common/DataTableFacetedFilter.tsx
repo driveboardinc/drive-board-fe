@@ -13,7 +13,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { setFilters, setPageIndex } from '@/feature/slice/paginationSlice';
+import { setFilters, setPageIndex } from '@/store/slice/paginationSlice';
 import {
   Command,
   CommandEmpty,

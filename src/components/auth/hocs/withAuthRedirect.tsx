@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import {
   selectCurrentUser,
   selectIsAuthenticated,
-} from '@/feature/slice/authSlice';
+} from '@/store/slice/authSlice';
 import RippleLoader from '@/components/ui/loader/RippleLoader';
 
 export function withAuthRedirect<P extends object>(
