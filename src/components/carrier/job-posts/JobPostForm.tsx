@@ -55,7 +55,7 @@ export function JobPostForm() {
         maximum: 0,
         rate: 'per hour',
       },
-      experience_level: 'Entry',
+      experience_level: '3 years',
       benefits: [],
       job_description: '',
       customized_pre_screening: [],

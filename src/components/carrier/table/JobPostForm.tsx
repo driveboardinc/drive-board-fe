@@ -60,7 +60,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
         maximum: 0,
         rate: 'per hour',
       },
-      experience_level: post?.experience_level ?? 'Entry',
+      experience_level: post?.experience_level ?? '3 years',
       benefits: post?.benefits ?? [],
       job_description: post?.job_description ?? '',
       customized_pre_screening: post?.customized_pre_screening ?? [],

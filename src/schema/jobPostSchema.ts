@@ -9,16 +9,21 @@ export const jobTypeOptions = [
 ] as const;
 export const shiftOptions = ['Day', 'Night', 'Rotating', 'Flexible'] as const;
 export const experienceLevelOptions = [
-  'Entry',
-  'Mid',
-  'Senior',
-  'Lead',
-  'Executive',
+  '1 month',
+  '2 months',
+  '3 months',
+  '6 months',
+  '1 year',
+  '2 years',
+  '3 years',
+  '4 years',
+  '5 years',
+  '5+ years',
 ] as const;
-export const applicationMethodOptions = [
-  'Direct',
-  'External URL',
-  'Email',
+export const vehicleTypes = [
+  'Box Truck',
+  'Cargo/Cube Van',
+  'Semi Truck',
 ] as const;
 
 export const qualificationOptions = [
@@ -99,6 +104,7 @@ export const jobPostSchema = z.object({
     .min(50, 'Job description must be at least 50 characters'),
   customized_pre_screening: z.array(z.string()).optional(),
   qualifications: z.array(z.enum(qualificationOptions)),
+  vehicle_type: z.enum(vehicleTypes),
 
   // Settings
   required_resume: z.boolean(),
@@ -107,7 +113,7 @@ export const jobPostSchema = z.object({
   background_check: z.boolean(),
 });
 
-export const tableJobPostSchema = z.object({
+export const tableJobPostSchema = jobPostSchema.extend({
   id: z.number(),
   job_title: z.string(),
   num_openings: z.number(),
@@ -134,11 +140,14 @@ export const tableJobPostSchema = z.object({
 });
 
 export type TableJobPost = z.infer<typeof tableJobPostSchema>;
+export type JobPostFormData = z.infer<typeof jobPostSchema>;
 
-// If you need create/update schemas like in postSchema:
-export const createJobPostSchema = jobPostSchema;
-export const updateJobPostSchema = jobPostSchema;
-
-export type JobPostFormData =
-  | z.infer<typeof createJobPostSchema>
-  | z.infer<typeof updateJobPostSchema>;
+export type Job = z.infer<typeof tableJobPostSchema> & {
+  carrier: {
+    name: string;
+    avatar: string;
+  };
+  status: string;
+  posted_at: string;
+  salary: number;
+};
