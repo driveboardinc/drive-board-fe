@@ -1,31 +1,48 @@
-"use client";
+'use client';
 
-import type React from "react";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
-import { SigninVector } from "@/components/svg-vector/signin-vector";
-import { Icons } from "@/components/icon";
-import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@/store/store";
-import { signin } from "@/store/authSlice";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
+import type React from 'react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { SigninVector } from '@/components/svg-vector/signin-vector';
+import { Icons } from '@/components/icon';
+import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSignInMutation } from '@/store/api/authDriverApiSlice';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useRouter } from 'next/navigation';
+import { RootState } from '@/lib/store';
+import { useToast } from '@/hooks/useToast';
+import { setCredentials } from '@/store/slice/authSlice';
+import { Error } from '@/interface/IErrorType';
 
 export default function SigninPage() {
-  const [formData, setFormData] = useState({ email: "", password: "", userType: "driver" });
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    userType: 'driver',
+  });
+  const [driverSignin] = useSignInMutation();
+  const dispatch = useDispatch();
+  const toast = useToast();
   const error = useSelector((state: RootState) => state.auth.error);
-  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/driver-dashboard");
+      router.push('/driver-dashboard');
     }
   }, [isAuthenticated, router]);
 
@@ -35,18 +52,36 @@ export default function SigninPage() {
 
   const handleUserTypeChange = (value: string) => {
     setFormData({ ...formData, userType: value });
-    router.push(value === "driver" ? "/driver/signin" : "/carrier/signin");
+    router.push(value === 'driver' ? '/driver/signin' : '/carrier/signin');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(
-      signin({
-        email: formData.email,
-        password: formData.password,
-        userType: formData.userType,
-      })
-    );
+    try {
+      const response = await driverSignin({
+        ...formData,
+        is_carrier: false,
+        is_driver: true,
+      }).unwrap();
+
+      if (response.access && response.refresh) {
+        // Dispatch the credentials to Redux store
+        dispatch(setCredentials(response));
+
+        toast.success({
+          title: 'Sign in successful',
+          description: 'You have successfully signed in',
+        });
+        router.push('/driver-dashboard');
+      }
+    } catch (error: unknown) {
+      if ((error as Error).originalStatus === 403) {
+        toast.error({
+          title: 'Sign in failed',
+          description: 'Invalid email or password. Please try again.',
+        });
+      }
+    }
   };
 
   return (
@@ -70,10 +105,16 @@ export default function SigninPage() {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
-              <Label htmlFor="userType" className="text-lg font-medium text-gray-700">
+              <Label
+                htmlFor="userType"
+                className="text-lg font-medium text-gray-700"
+              >
                 I am a:
               </Label>
-              <Select defaultValue="driver" onValueChange={handleUserTypeChange}>
+              <Select
+                defaultValue="driver"
+                onValueChange={handleUserTypeChange}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select user type" />
                 </SelectTrigger>
@@ -83,7 +124,10 @@ export default function SigninPage() {
                 </SelectContent>
               </Select>
 
-              <Label htmlFor="email" className="text-lg font-medium text-gray-700">
+              <Label
+                htmlFor="email"
+                className="text-lg font-medium text-gray-700"
+              >
                 Email Address
               </Label>
               <Input
@@ -96,7 +140,10 @@ export default function SigninPage() {
                 className="w-full h-12 font-inter"
               />
 
-              <Label htmlFor="password" className="text-lg font-medium text-gray-700">
+              <Label
+                htmlFor="password"
+                className="text-lg font-medium text-gray-700"
+              >
                 Password
               </Label>
               <Input
@@ -117,9 +164,13 @@ export default function SigninPage() {
         </form>
         <div className="mt-6">
           <p className="text-sm text-gray-600">
-            Don&apos;t have an account?{" "}
+            Don&apos;t have an account?{' '}
             <Link
-              href={formData.userType === "driver" ? "/driver/signup" : "/carrier/signup"}
+              href={
+                formData.userType === 'driver'
+                  ? '/driver/signup'
+                  : '/carrier/signup'
+              }
               className="text-custom-purple font-semibold hover:underline"
             >
               Sign up

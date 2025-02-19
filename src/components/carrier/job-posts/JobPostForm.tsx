@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 
@@ -24,15 +24,11 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import {
-  useCreateJobPostMutation,
-  useUpdateJobPostMutation,
-} from '@/store/api/jobPostApiSlice';
-import { ErrorResponse } from '@/interface/IErrorType';
-import { JobPostFormProps } from '@/interface/IDialogFormType';
+import { useCreateJobPostMutation } from '@/store/api/jobPostApiSlice';
+import type { ErrorResponse } from '@/interface/IErrorType';
 import {
   jobPostSchema,
-  JobPostFormData,
+  type JobPostFormData,
   jobTypeOptions,
   shiftOptions,
   experienceLevelOptions,
@@ -41,34 +37,33 @@ import {
   benefitsOptions,
 } from '@/schema/jobPostSchema';
 
-export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
+export function JobPostForm() {
   const [createPost] = useCreateJobPostMutation();
-  const [updatePost] = useUpdateJobPostMutation();
 
   const form = useForm<JobPostFormData>({
     resolver: zodResolver(jobPostSchema),
     defaultValues: {
-      job_title: post?.job_title ?? '',
-      num_openings: post?.num_openings ?? 1,
-      location: post?.location ?? '',
-      job_type: post?.job_type ? [post.job_type] : ['Full-time'],
-      shift: post?.shift ?? 'Day',
-      day_range: post?.day_range ?? '',
-      pay: post?.pay ?? {
+      job_title: '',
+      num_openings: 1,
+      location: '',
+      job_type: ['Full-time'],
+      shift: 'Day',
+      day_range: '',
+      pay: {
         type: 'Range',
         minimum: 0,
         maximum: 0,
         rate: 'per hour',
       },
-      experience_level: post?.experience_level ?? '3 years',
-      benefits: post?.benefits ?? [],
-      job_description: post?.job_description ?? '',
-      customized_pre_screening: post?.customized_pre_screening ?? [],
-      qualifications: post?.qualifications ?? [],
-      required_resume: post?.required_resume ?? true,
-      application_updates: post?.application_updates ?? '',
-      candidates_contact_you: post?.candidates_contact_you ?? true,
-      background_check: post?.background_check ?? false,
+      experience_level: '3 years',
+      benefits: [],
+      job_description: '',
+      customized_pre_screening: [],
+      qualifications: [],
+      required_resume: true,
+      application_updates: '',
+      candidates_contact_you: true,
+      background_check: false,
     },
   });
 
@@ -80,45 +75,20 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
     };
 
     try {
-      if (!post) {
-        const result = await createPost(payload).unwrap();
-        if (result.success) {
-          toast(result.message);
-
-          setShowDialog(false);
-        } else {
-          Object.entries(result.data).forEach(([field, messages]) => {
-            if (Array.isArray(messages)) {
-              messages.forEach((message) =>
-                setError(field as keyof JobPostFormData, {
-                  type: 'manual',
-                  message,
-                })
-              );
-            }
-          });
-        }
+      const result = await createPost(payload).unwrap();
+      if (result.success) {
+        toast(result.message);
       } else {
-        const result = await updatePost({
-          id: post.id,
-          updates: payload,
-        }).unwrap();
-        if (result.success) {
-          toast(result.message);
-          setShowDialog(false);
-        } else {
-          Object.entries(result.data).forEach(([field, messages]) => {
-            if (Array.isArray(messages)) {
-              messages.forEach((message) =>
-                setError(field as keyof JobPostFormData, {
-                  type: 'manual',
-                  message,
-                })
-              );
-            }
-          });
-          toast(result.message);
-        }
+        Object.entries(result.data).forEach(([field, messages]) => {
+          if (Array.isArray(messages)) {
+            messages.forEach((message) =>
+              setError(field as keyof JobPostFormData, {
+                type: 'manual',
+                message,
+              })
+            );
+          }
+        });
       }
     } catch (error: unknown) {
       const axiosError = error as ErrorResponse;
@@ -160,7 +130,9 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
                   <Input
                     type="number"
                     {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    onChange={(e) =>
+                      field.onChange(Number.parseInt(e.target.value))
+                    }
                     placeholder="Enter number of openings"
                   />
                 </FormControl>
@@ -415,7 +387,6 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
             )}
           />
 
-          {/* Benefits */}
           <FormField
             control={form.control}
             name="benefits"
@@ -466,8 +437,6 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
             )}
           />
         </div>
-
-        {/* Benefits */}
 
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Settings</h2>
@@ -543,7 +512,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
           type="submit"
           disabled={!form.formState.isValid}
         >
-          {post ? 'Update Job Post' : 'Create Job Post'}
+          Create Job Post
         </Button>
       </form>
     </Form>

@@ -2,7 +2,7 @@ import {
   // Tag,
   Users,
   Settings,
-  Bookmark,
+  // Bookmark,
   SquarePen,
   LayoutGrid,
   LucideIcon,
@@ -30,8 +30,19 @@ type Group = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getCarrierMenuList(pathname: string): Group[] {
   return [
+    // {
+    //   groupLabel: '',
+    //   menus: [
+    //     {
+    //       href: '/carrier/dashboard',
+    //       label: 'Dashboard',
+    //       icon: LayoutGrid,
+    //       submenus: [],
+    //     },
+    //   ],
+    // },
     {
-      groupLabel: '',
+      groupLabel: 'Jobs',
       menus: [
         {
           href: '/carrier/dashboard',
@@ -39,27 +50,22 @@ export function getCarrierMenuList(pathname: string): Group[] {
           icon: LayoutGrid,
           submenus: [],
         },
-      ],
-    },
-    {
-      groupLabel: 'Jobs',
-      menus: [
-        {
-          href: '',
-          label: 'Job Posts',
-          icon: SquarePen,
-          submenus: [
-            {
-              href: '/carrier/job-posts',
-              label: 'All Posts',
-            },
-          ],
-        },
         {
           href: '/carrier/job-posts',
-          label: 'Categories',
-          icon: Bookmark,
+          label: 'Job Posts',
+          icon: SquarePen,
+          // submenus: [
+          //   {
+          //     href: '/carrier/job-posts',
+          //     label: 'All Posts',
+          //   },
+          // ],
         },
+        // {
+        //   href: '/carrier/job-posts',
+        //   label: 'Categories',
+        //   icon: Bookmark,
+        // },
       ],
     },
     {

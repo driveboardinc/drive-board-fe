@@ -11,12 +11,15 @@ const API_ENDPOINT = {
     ID: '/:id',
     SLUG: '/slug/:slug',
   },
-  SIGNUP: {
-    PATH: `${ROOT_API}/api/signup`,
+  CARRIER: {
+    SIGNUP: `/carrier/profile/create/`,
+    SIGNIN: `/login/`,
   },
-  SIGNIN: {
-    PATH: `${ROOT_API}/api/signin`,
+
+  DRIVER: {
+    SIGNUP: `/driver/profile/create/`,
+    SIGNIN: `/login/`,
   },
 };
 
-export { API_ENDPOINT };
+export { API_ENDPOINT, ROOT_API };

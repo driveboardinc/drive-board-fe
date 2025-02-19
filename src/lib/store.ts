@@ -1,18 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import paginationReducer from '@/feature/slice/paginationSlice';
+import paginationReducer from '@/store/slice/paginationSlice';
+import authReducer from '@/store/slice/authSlice';
 import { combineReducers } from 'redux';
-import { apiSlice } from '@/app/api/apiSlice';
+import { apiSlice } from '@/store/api/apiSlice';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: [''],
+  whitelist: ['auth'],
 };
 
 const rootReducer = combineReducers({
-  // auth: authReducer,
+  auth: authReducer,
   pageDetails: paginationReducer,
   [apiSlice.reducerPath]: apiSlice.reducer,
 });

@@ -1,21 +1,29 @@
-"use client";
+'use client';
 
-import type React from "react";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, ArrowRight, Check, Truck } from "lucide-react";
-import { questions, type Question, type FormData } from "@/constants/questions";
-import { SignupVector } from "@/components/svg-vector/signup-vector";
-import Link from "next/link";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/store/store";
-import { signup } from "@/store/authSlice";
-import { useRouter } from "next/navigation";
+import type React from 'react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
+import { ArrowLeft, ArrowRight, Check, Truck } from 'lucide-react';
+import { questions, type Question, type FormData } from '@/constants/questions';
+import { SignupVector } from '@/components/svg-vector/signup-vector';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useDriverSignupMutation } from '@/store/api/authDriverApiSlice';
+import { redirect } from 'next/navigation';
+import { useToast } from '@/hooks/useToast';
+import ROUTE from '@/constants/ROUTE';
+import { Error } from '@/interface/IErrorType';
 
 const getVisibleQuestions = (questions: Question[], formData: FormData) => {
   return questions.filter((question) => {
@@ -25,10 +33,11 @@ const getVisibleQuestions = (questions: Question[], formData: FormData) => {
 };
 
 export default function SignupPage() {
+  const toast = useToast();
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [formData, setFormData] = useState<FormData>({ userType: "driver" });
-  const dispatch = useDispatch<AppDispatch>();
+  const [formData, setFormData] = useState<FormData>({ userType: 'driver' });
   const router = useRouter();
+  const [driverSignup] = useDriverSignupMutation();
 
   const visibleQuestions = getVisibleQuestions(questions, formData);
   const question = visibleQuestions[currentQuestion];
@@ -56,18 +65,31 @@ export default function SignupPage() {
 
   const handleUserTypeChange = (value: string) => {
     setFormData({ ...formData, userType: value });
-    router.push(value === "driver" ? "/driver/signup" : "/carrier/signup");
+    router.push(value === 'driver' ? '/driver/signup' : '/carrier/signup');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(
-      signup({
-        email: formData.email,
-        password: formData.password,
-        userType: formData.userType,
-      })
-    );
+    try {
+      const response = await driverSignup({
+        ...formData,
+        is_driver: true,
+      }).unwrap();
+      if (response.email) {
+        toast.success({
+          title: 'Signup successful',
+          description: 'You have successfully signed up',
+        });
+        redirect(ROUTE.DRIVER.SIGNIN);
+      }
+    } catch (error: unknown) {
+      if ((error as Error).originalStatus === 403) {
+        toast.error({
+          title: 'Signup failed',
+          description: 'Something went wrong. Please try again.',
+        });
+      }
+    }
   };
 
   return (
@@ -78,7 +100,9 @@ export default function SignupPage() {
       <div className="w-1/2 h-full flex flex-col justify-center items-start p-8">
         <div className="flex items-center gap-2 py-2">
           <Truck className="w-10 h-10 text-custom-purple" />
-          <h1 className="text-3xl font-bold text-gray-800">Drive. Earn. Succeed.</h1>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Drive. Earn. Succeed.
+          </h1>
         </div>
 
         <Progress value={progress} className="mb-6" />
@@ -94,10 +118,16 @@ export default function SignupPage() {
             >
               {currentQuestion === 0 && (
                 <>
-                  <Label htmlFor="userType" className="text-lg font-medium text-gray-700">
+                  <Label
+                    htmlFor="userType"
+                    className="text-lg font-medium text-gray-700"
+                  >
                     I am signing up as a:
                   </Label>
-                  <Select defaultValue="driver" onValueChange={handleUserTypeChange}>
+                  <Select
+                    defaultValue="driver"
+                    onValueChange={handleUserTypeChange}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select user type" />
                     </SelectTrigger>
@@ -110,11 +140,18 @@ export default function SignupPage() {
               )}
               {currentQuestion > 0 && (
                 <>
-                  <Label htmlFor={question.id} className="text-lg font-medium text-gray-700">
+                  <Label
+                    htmlFor={question.id}
+                    className="text-lg font-medium text-gray-700"
+                  >
                     {question.label}
                   </Label>
-                  {question.type === "select" ? (
-                    <Select onValueChange={(value) => handleSelectChange(value, question.id)}>
+                  {question.type === 'select' ? (
+                    <Select
+                      onValueChange={(value) =>
+                        handleSelectChange(value, question.id)
+                      }
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder={question.placeholder} />
                       </SelectTrigger>
@@ -131,7 +168,7 @@ export default function SignupPage() {
                       id={question.id}
                       type={question.type}
                       onChange={handleInputChange}
-                      value={formData[question.id] || ""}
+                      value={formData[question.id] || ''}
                       placeholder={question.placeholder}
                       required
                       className="w-full h-12"
@@ -164,9 +201,13 @@ export default function SignupPage() {
         </form>
         <div className="mt-6 ">
           <p className="text-sm text-gray-600">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link
-              href={formData.userType === "driver" ? "/driver/signin" : "/carrier/signin"}
+              href={
+                formData.userType === 'driver'
+                  ? '/driver/signin'
+                  : '/carrier/signin'
+              }
               className="text-custom-purple font-semibold hover:underline"
             >
               Sign in

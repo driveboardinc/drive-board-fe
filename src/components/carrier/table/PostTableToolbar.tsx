@@ -10,7 +10,7 @@ import {
   setFilters,
   setPageIndex,
   setRefetchData,
-} from '@/feature/slice/paginationSlice';
+} from '@/store/slice/paginationSlice';
 import { DataTableFacetedFilter } from '@/components/common/DataTableFacetedFilter';
 import { DataTableViewOptions } from '@/components/common/DataTableViewOptions';
 import { facetConfig, postFilterConfig } from './PostTableConfig';

@@ -1,13 +1,13 @@
-import { Search, MapPin, Filter } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Search, MapPin, Filter } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import type { SortOption } from "@/types";
+} from '@/components/ui/dropdown-menu';
+import type { SortOption } from '@/types';
 
 interface JobSearchProps {
   searchTerm: string;
@@ -25,14 +25,15 @@ export function JobSearch({
   onSearchChange,
   onLocationChange,
   onSubmit,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   sortBy,
   onSortChange,
 }: JobSearchProps) {
   const sortOptions = [
-    { value: "date", label: "Date Posted" },
-    { value: "pay", label: "Pay" },
-    { value: "az", label: "A-Z" },
-    { value: "location", label: "Location" },
+    { value: 'date', label: 'Date Posted' },
+    { value: 'pay', label: 'Pay' },
+    { value: 'az', label: 'A-Z' },
+    { value: 'location', label: 'Location' },
   ];
 
   return (
@@ -70,7 +71,10 @@ export function JobSearch({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {sortOptions.map((option) => (
-              <DropdownMenuItem key={option.value} onSelect={() => onSortChange(option.value as SortOption)}>
+              <DropdownMenuItem
+                key={option.value}
+                onSelect={() => onSortChange(option.value as SortOption)}
+              >
                 {option.label}
               </DropdownMenuItem>
             ))}
