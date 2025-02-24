@@ -4,51 +4,51 @@ import {
   BaseQueryFn,
   FetchArgs,
   FetchBaseQueryError,
-} from '@reduxjs/toolkit/query/react';
-import { Mutex } from 'async-mutex';
-import {
-  setAuthCookies,
-  clearAuthCookies,
-  getAccessToken,
-  getRefreshToken,
-} from '@/utils/auth';
+} from "@reduxjs/toolkit/query/react";
+import { Mutex } from "async-mutex";
+import { setAuthCookies, clearAuthCookies, getAccessToken, getRefreshToken } from "@/utils/auth";
 
-export const baseUrl =
-  process.env.NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_API_URL
-    : process.env.NEXT_PUBLIC_API_URL;
+// Make sure this matches your API URL exactly
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: baseUrl,
-  credentials: 'include',
-  prepareHeaders: (headers) => {
-    const token = getAccessToken();
+  baseUrl,
+  credentials: "include",
+  prepareHeaders: async (headers) => {
+    const token = await getAccessToken();
     if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
+      headers.set("authorization", `Bearer ${token}`);
     }
+    headers.set("Content-Type", "application/json");
     return headers;
   },
 });
 
 const mutex = new Mutex();
 
-const baseQueryWithReauth: BaseQueryFn<
-  string | FetchArgs,
-  unknown,
-  FetchBaseQueryError
-> = async (args, api, extraOptions) => {
+const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
   await mutex.waitForUnlock();
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 403) {
+  // Check for 401 Unauthorized response
+  if (result.error && (result.error.status === 401 || result.error.status === 403)) {
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
       try {
-        const refreshToken = getRefreshToken();
+        const refreshToken = await getRefreshToken();
+        if (!refreshToken) {
+          clearAuthCookies();
+          return result;
+        }
+
         const refreshResult = await baseQuery(
           {
-            url: '/auth/refresh',
-            method: 'POST',
+            url: "/auth/refresh",
+            method: "POST",
             body: { refresh: refreshToken },
           },
           api,
@@ -60,11 +60,11 @@ const baseQueryWithReauth: BaseQueryFn<
             access: string;
             refresh: string;
           };
-          setAuthCookies(access, refresh);
-          // Retry the original query
+          await setAuthCookies(access, refresh);
+          // Retry the original query with new token
           result = await baseQuery(args, api, extraOptions);
         } else {
-          clearAuthCookies();
+          await clearAuthCookies();
         }
       } finally {
         release();
@@ -80,6 +80,6 @@ const baseQueryWithReauth: BaseQueryFn<
 
 export const apiSlice = createApi({
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['JobPost'],
+  tagTypes: ["JobPost"],
   endpoints: () => ({}),
 });

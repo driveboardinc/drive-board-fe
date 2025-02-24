@@ -3,6 +3,7 @@ export interface Question {
   label: string;
   type: string;
   placeholder: string;
+  required?: boolean;
   options?: { value: string; label: string }[];
   conditional?: (formData: FormData) => boolean;
 }

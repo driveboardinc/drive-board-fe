@@ -1,4 +1,7 @@
+"use client";
+
 import type React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -9,10 +12,51 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, MessageSquare, User } from "lucide-react";
+import { Bell, MessageSquare, User, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/useToast";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  logout as logoutAction,
+  setLoggingOut,
+  selectCurrentUser,
+  selectIsLoggingOut,
+} from "@/store/slice/authSlice";
+import type { AppDispatch } from "@/lib/store"; // Make sure this path is correct
 
 const DriverDashboardHeader: React.FC = () => {
+  const router = useRouter();
+  const { success, error } = useToast(); // ✅ Fix here
+  const dispatch = useDispatch<AppDispatch>();
+  const [isOpen, setIsOpen] = useState(false);
+  const user = useSelector(selectCurrentUser);
+  const isLoggingOut = useSelector(selectIsLoggingOut);
+
+  const handleLogout = async () => {
+    try {
+      dispatch(setLoggingOut(true));
+
+      dispatch(logoutAction());
+
+      success({
+        title: "Logged out successfully",
+        description: "You have been logged out of your account",
+      });
+
+      setIsOpen(false);
+      router.push("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+      error({
+        title: "Logout failed",
+        description: "There was a problem logging out. Please try again.",
+      });
+    } finally {
+      dispatch(setLoggingOut(false));
+    }
+  };
+
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white px-6">
       <div className="flex items-center space-x-8">
@@ -24,16 +68,18 @@ const DriverDashboardHeader: React.FC = () => {
         <nav className="hidden md:flex">
           <ul className="flex space-x-6">
             <li>
-              <Link
-                href="/dashboard"
-                className="text-sm text-gray-600 hover:text-[#6B5ECD] transition-colors"
-              >
-                Dashboard
+              <Link href="#" className="text-sm text-gray-600 hover:text-[#6B5ECD] transition-colors">
+                Driver Resource
               </Link>
             </li>
             <li>
-              <Link href="/schedule" className="text-sm text-gray-600 hover:text-[#6B5ECD] transition-colors">
-                Schedule
+              <Link href="#" className="text-sm text-gray-600 hover:text-[#6B5ECD] transition-colors">
+                Sponsored Companies
+              </Link>
+            </li>
+            <li>
+              <Link href="#" className="text-sm text-gray-600 hover:text-[#6B5ECD] transition-colors">
+                Load Board
               </Link>
             </li>
           </ul>
@@ -53,22 +99,42 @@ const DriverDashboardHeader: React.FC = () => {
             5
           </span>
         </Button>
-        <DropdownMenu>
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="text-gray-600 hover:text-[#6B5ECD]">
               <User className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              {user?.username || "My Account"}
+              {user?.email && <p className="text-xs text-muted-foreground">{user.email}</p>}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-            <DropdownMenuItem>Help Center</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">
-              <Link href="/logout" className="w-full">
-                Logout
+            <DropdownMenuItem>
+              <Link href="/profile-settings" className="w-full">
+                Profile Settings
               </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/help-center" className="w-full">
+                Help Center
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600 cursor-pointer"
+              disabled={isLoggingOut}
+              onClick={handleLogout}
+            >
+              {isLoggingOut ? (
+                <div className="flex items-center">
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Logging out...
+                </div>
+              ) : (
+                "Logout"
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
