@@ -1,9 +1,12 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { ButtonSelect } from "@/components/ui/button-select";
+import { LocationAutocomplete } from "@/components/ui/location-autocomplete";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { useDriverSignupMutation } from "@/store/api/authDriverApiSlice";
 import { useToast } from "@/hooks/useToast";
 import ROUTE from "@/constants/ROUTE";
-import { Error } from "@/interface/IErrorType";
+import type { Error } from "@/interface/IErrorType";
 
 const getVisibleQuestions = (questions: Question[], formData: FormData) => {
   return questions.filter((question) => {
@@ -31,10 +34,35 @@ export default function SignupPage() {
   const [formData, setFormData] = useState<FormData>({ userType: "driver" });
   const router = useRouter();
   const [driverSignup] = useDriverSignupMutation();
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const visibleQuestions = getVisibleQuestions(questions, formData);
+  const visibleQuestions = [
+    {
+      id: "userType",
+      label: "I am signing up as a:",
+      type: "select",
+      placeholder: "Select user type",
+      options: [
+        { value: "driver", label: "Driver" },
+        { value: "carrier", label: "Carrier" },
+      ],
+    },
+    ...getVisibleQuestions(questions, formData),
+  ];
   const question = visibleQuestions[currentQuestion];
   const progress = ((currentQuestion + 1) / visibleQuestions.length) * 100;
+
+  useEffect(() => {
+    if (
+      question?.type === "text" ||
+      question?.type === "email" ||
+      question?.type === "password" ||
+      question?.type === "number" ||
+      question?.type === "date"
+    ) {
+      inputRef.current?.focus();
+    }
+  }, [question?.type]);
 
   const handleNext = () => {
     const currentQ = visibleQuestions[currentQuestion];
@@ -65,12 +93,40 @@ export default function SignupPage() {
     setFormData({ ...formData, [id]: value });
   };
 
+  const handleButtonSelectChange = (value: string, id: string) => {
+    setFormData({ ...formData, [id]: value });
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleLocationChange = (value: string, locationData: any) => {
+    console.log("Location selected:", value, locationData);
+    setFormData({
+      ...formData,
+      zip_code: value,
+      city: locationData.city,
+      state: locationData.state,
+      location: locationData.formatted_address,
+      locationData: locationData,
+    });
+  };
+
   const handleUserTypeChange = (value: string) => {
     setFormData({ ...formData, userType: value });
     router.push(value === "driver" ? "/driver/signup" : "/carrier/signup");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent default form submission on Enter
+      if (currentQuestion === visibleQuestions.length - 1) {
+        handleSubmit(e as unknown as React.FormEvent); // Submit if on the last question
+      } else {
+        handleNext(); // Otherwise, go to the next question
+      }
+    }
+  };
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const requiredFields = visibleQuestions.filter((q) => q.required).map((q) => q.id);
@@ -93,6 +149,10 @@ export default function SignupPage() {
         password: formData.password,
         is_driver: true,
         is_carrier: false,
+        user: {
+          email: formData.email,
+          password: formData.password,
+        },
       }).unwrap();
 
       if (response.email) {
@@ -124,7 +184,7 @@ export default function SignupPage() {
       }
       console.error("Signup error:", err);
     }
-  };
+  }
 
   return (
     <div className="w-full h-screen flex items-center overflow-hidden bg-white shadow-xl">
@@ -138,7 +198,7 @@ export default function SignupPage() {
         </div>
 
         <Progress value={progress} className="mb-6" />
-        <form onSubmit={handleSubmit} className="space-y-6 w-full">
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-6 w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentQuestion}
@@ -182,8 +242,31 @@ export default function SignupPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                  ) : question.type === "button-select" ? (
+                    <ButtonSelect
+                      options={question.options || []}
+                      value={formData[question.id]}
+                      onChange={(value) => handleButtonSelectChange(value, question.id)}
+                      className="mt-2"
+                    />
+                  ) : question.type === "location" ? (
+                    <LocationAutocomplete
+                      id={question.id}
+                      label=""
+                      value={formData.zip_code || ""}
+                      onChange={handleLocationChange}
+                      onLocationSelect={() => {
+                        // Only proceed if we have valid location data
+                        if (formData.city && formData.state) {
+                          handleNext();
+                        }
+                      }}
+                      placeholder={question.placeholder}
+                      required={question.required}
+                    />
                   ) : (
                     <Input
+                      ref={inputRef}
                       id={question.id}
                       type={question.type}
                       onChange={handleInputChange}
