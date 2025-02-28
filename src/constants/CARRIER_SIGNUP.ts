@@ -95,8 +95,8 @@ export const carrierSignupData = {
     },
     {
       id: "representative_name",
-      label: "👤 Who's your **company rep**?",
-      highlight: ["company rep"],
+      label: "👤 Who is the **Representative** for your Drive Board Account?",
+      highlight: ["Representative"],
       type: "text",
       required: true,
       validation: [
