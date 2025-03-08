@@ -86,7 +86,10 @@ export default function SignupPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.type === "number" ? Number(e.target.value) : e.target.value,
+    });
   };
 
   const handleSelectChange = (value: string, id: string) => {
@@ -130,7 +133,7 @@ export default function SignupPage() {
     e.preventDefault();
 
     const requiredFields = visibleQuestions.filter((q) => q.required).map((q) => q.id);
-    requiredFields.push("email", "password"); // Ensure these fields are required
+    requiredFields.push("email", "password", "recent_felony", "past_felony"); // Ensure these fields are required
 
     const missingFields = requiredFields.filter((field) => !formData[field]);
 
@@ -149,10 +152,7 @@ export default function SignupPage() {
         password: formData.password,
         is_driver: true,
         is_carrier: false,
-        user: {
-          email: formData.email,
-          password: formData.password,
-        },
+        user: formData.userId, // Ensure this is the correct pk value
       }).unwrap();
 
       if (response.email) {
@@ -166,16 +166,23 @@ export default function SignupPage() {
     } catch (error: unknown) {
       const err = error as Error;
 
-      if (err.originalStatus === 400) {
-        toast.error({
-          title: "Validation Error",
-          description: "Please check your information and try again.",
-        });
-      } else if (err.originalStatus === 409) {
-        toast.error({
-          title: "Account Already Exists",
-          description: "An account with this email already exists. Please sign in instead.",
-        });
+      if (err && err.originalStatus) {
+        if (err.originalStatus === 400) {
+          toast.error({
+            title: "Validation Error",
+            description: "Please check your information and try again.",
+          });
+        } else if (err.originalStatus === 409) {
+          toast.error({
+            title: "Account Already Exists",
+            description: "An account with this email already exists. Please sign in instead.",
+          });
+        } else {
+          toast.error({
+            title: "Sign up failed",
+            description: "An unexpected error occurred. Please try again later.",
+          });
+        }
       } else {
         toast.error({
           title: "Sign up failed",
@@ -266,11 +273,13 @@ export default function SignupPage() {
                     />
                   ) : (
                     <Input
+                      type="number"
                       ref={inputRef}
-                      id={question.id}
-                      type={question.type}
+                      // id={question.id}
+                      id="experience"
+                      // type={question.type}
                       onChange={handleInputChange}
-                      value={formData[question.id] || ""}
+                      value={formData.experience || ""}
                       placeholder={question.placeholder}
                       required
                       className="w-full h-12"

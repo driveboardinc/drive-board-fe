@@ -127,7 +127,6 @@ export const questions: Question[] = [
       { value: "3+", label: "3+" },
     ],
   },
-  { id: "zip_code", label: "What's your zip code?", type: "text", placeholder: "12345", required: true },
   {
     id: "misdemeanors_3years",
     label: "Have you had any misdemeanors in the past 3 years?",

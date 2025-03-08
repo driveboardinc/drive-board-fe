@@ -14,10 +14,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSignInMutation } from "@/store/api/authDriverApiSlice";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import { RootState } from "@/lib/store";
+import type { RootState } from "@/lib/store";
 import { useToast } from "@/hooks/useToast";
 import { setCredentials } from "@/store/slice/authSlice";
-import { Error } from "@/interface/IErrorType";
+import type { Error } from "@/interface/IErrorType";
 import { setAuthCookies } from "@/utils/auth";
 
 export default function SigninPage() {
@@ -35,7 +35,8 @@ export default function SigninPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/driver");
+      // Redirect to subscription plans page instead of directly to driver dashboard
+      router.push("/subscription-plans");
     }
   }, [isAuthenticated, router]);
 
@@ -78,7 +79,8 @@ export default function SigninPage() {
           description: "You have successfully signed in",
         });
 
-        router.push("/driver");
+        // Redirect to subscription plans page instead of directly to driver dashboard
+        router.push("/subscription-plans");
       }
     } catch (error: unknown) {
       const err = error as Error;

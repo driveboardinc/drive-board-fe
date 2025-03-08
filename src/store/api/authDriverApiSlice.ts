@@ -58,10 +58,12 @@ export const authDriverApiSlice = apiSlice.injectEndpoints({
         return response;
       },
       transformErrorResponse: (response: ErrorResponse) => {
+        console.error("Error response:", response);
+        const message = response.data?.message || response.data?.detail || "An error occurred during signup";
         return {
           status: response.status,
-          message: response.data.message || response.data.detail || "An error occurred during signup",
-          errors: response.data.errors || {},
+          message: message,
+          errors: response.data?.errors || {},
         };
       },
       invalidatesTags: [{ type: "JobPost" }],

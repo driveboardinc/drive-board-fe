@@ -10,7 +10,7 @@ const navigation = [
   { name: "Home", href: "/" },
   { name: "About Us", href: "/about-us" },
   { name: "Driver Resources", href: "/resources" },
-  { name: "Live Board", href: "/board" },
+  { name: "Load Board", href: "/load-board" },
   { name: "Contact Us", href: "/contact-us" },
 ];
 
