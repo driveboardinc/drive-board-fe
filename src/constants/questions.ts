@@ -2,97 +2,169 @@ export interface Question {
   id: string;
   label: string;
   type: string;
-  placeholder: string;
+  placeholder?: string;
+  required?: boolean;
   options?: { value: string; label: string }[];
   conditional?: (formData: FormData) => boolean;
 }
 
 export interface FormData {
-  [key: string]: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: string | any;
 }
 
 export const questions: Question[] = [
-  { id: "first_name", label: "What's your first name?", type: "text", placeholder: "John" },
-  { id: "first_name", label: "What's your first name?", type: "text", placeholder: "John" },
-  { id: "last_name", label: "And your last name?", type: "text", placeholder: "Doe" },
-  { id: "email", label: "What's your email address?", type: "email", placeholder: "johndoe@example.com" },
-  { id: "password", label: "Create a password", type: "password", placeholder: "Enter a strong password" },
-  { id: "birthday", label: "When's your birthday?", type: "date", placeholder: "YYYY-MM-DD" },
+  { id: "first_name", label: "What's your first name?", type: "text", placeholder: "John", required: true },
+  { id: "last_name", label: "And your last name?", type: "text", placeholder: "Doe", required: true },
+  {
+    id: "email",
+    label: "What's your email address?",
+    type: "email",
+    placeholder: "johndoe@example.com",
+    required: true,
+  },
+  {
+    id: "password",
+    label: "Create a password",
+    type: "password",
+    placeholder: "Enter a strong password",
+    required: true,
+  },
+  { id: "birthday", label: "When's your birthday?", type: "date", placeholder: "YYYY-MM-DD", required: true },
+  {
+    id: "zip_code",
+    label: "What's your zip code?",
+    type: "location",
+    placeholder: "Enter your zip code",
+    required: true,
+  },
+  {
+    id: "driver_type",
+    label: "What type of driver are you?",
+    type: "button-select",
+    required: true,
+    options: [
+      { value: "owner_operator", label: "Owner Operator" },
+      { value: "delivery_courier", label: "Delivery Courier" },
+      { value: "job_seeker", label: "Regular Job Seeker" },
+    ],
+  },
   {
     id: "vehicle_type",
     label: "What type of vehicle do you drive?",
-    type: "select",
-    placeholder: "Select vehicle type",
+    type: "button-select",
+    required: true,
     options: [
-      { value: "owner-operator", label: "Owner Operator" },
-      { value: "delivery-courier", label: "Delivery Courier" },
+      { value: "semi_truck", label: "Semi Truck" },
+      { value: "box_truck", label: "Box Truck" },
+      { value: "cargo_van", label: "Cargo Van" },
+      { value: "suv_sedan", label: "SUV/Sedan" },
     ],
+    conditional: (formData: FormData) =>
+      formData.driver_type === "owner_operator" || formData.driver_type === "delivery_courier",
   },
-  { id: "vehicle_year", label: "What year is your vehicle?", type: "number", placeholder: "2023" },
-  { id: "vehicle_make", label: "What's the make of your vehicle?", type: "text", placeholder: "Toyota" },
-  { id: "vehicle_model", label: "And the model?", type: "text", placeholder: "Corolla" },
-  { id: "dot", label: "What's your DOT number? (Optional)", type: "text", placeholder: "12345678" },
-  { id: "mc", label: "What's your MC number? (Optional)", type: "text", placeholder: "MC123456" },
+  {
+    id: "vehicle_year",
+    label: "What year is your vehicle?",
+    type: "number",
+    placeholder: "2023",
+    required: true,
+    conditional: (formData: FormData) =>
+      formData.driver_type === "owner_operator" || formData.driver_type === "delivery_courier",
+  },
+  {
+    id: "vehicle_make",
+    label: "What's the make of your vehicle?",
+    type: "text",
+    placeholder: "Toyota",
+    required: true,
+    conditional: (formData: FormData) =>
+      formData.driver_type === "owner_operator" || formData.driver_type === "delivery_courier",
+  },
+  {
+    id: "vehicle_model",
+    label: "And the model?",
+    type: "text",
+    placeholder: "Corolla",
+    required: true,
+    conditional: (formData: FormData) =>
+      formData.driver_type === "owner_operator" || formData.driver_type === "delivery_courier",
+  },
+  {
+    id: "dot",
+    label: "What's your DOT number? (Optional)",
+    type: "text",
+    placeholder: "12345678",
+    conditional: (formData: FormData) => formData.driver_type === "owner_operator",
+  },
+  {
+    id: "mc",
+    label: "What's your MC number? (Optional)",
+    type: "text",
+    placeholder: "MC123456",
+    conditional: (formData: FormData) => formData.driver_type === "owner_operator",
+  },
   {
     id: "experience",
     label: "How many years of professional driving experience do you have?",
-    type: "number",
-    placeholder: "5",
+    type: "button-select",
+    required: true,
+    options: [
+      { value: "0-2", label: "0-2 years" },
+      { value: "3-5", label: "3-5 years" },
+      { value: "5-10", label: "5-10 years" },
+      { value: "10+", label: "10+ years" },
+    ],
   },
   {
     id: "accidents",
     label: "How many at-fault accidents have you had in the past 5 years?",
-    type: "select",
-    placeholder: "Select number of accidents",
-    options: [0, 1, 2, 3, 4, 5].map((i) => ({ value: i.toString(), label: i.toString() })),
-  },
-  { id: "zip_code", label: "What's your zip code?", type: "text", placeholder: "12345" },
-  {
-    id: "recent_felony",
-    label: "Have you had any misdemeanors or felonies in the past 3 years?",
-    type: "select",
-    placeholder: "Select an option",
+    type: "button-select",
+    required: true,
     options: [
-      { value: "yes", label: "Yes" },
-      { value: "no", label: "No" },
+      { value: "0", label: "None" },
+      { value: "1-2", label: "1-2" },
+      { value: "3+", label: "3+" },
     ],
   },
   {
-    id: "recent_felony_details",
-    label: "If yes, please describe the misdemeanor or felony",
-    type: "text",
-    placeholder: "Provide details here",
-    conditional: (formData: FormData) => formData.recent_felony === "yes",
-  },
-  {
-    id: "past_felony",
-    label: "Have you had any misdemeanors or felonies in the past 7 years?",
-    type: "select",
-    placeholder: "Select an option",
+    id: "misdemeanors_3years",
+    label: "Have you had any misdemeanors in the past 3 years?",
+    type: "button-select",
+    required: true,
     options: [
-      { value: "yes", label: "Yes" },
-      { value: "no", label: "No" },
+      { value: "none", label: "None" },
+      { value: "1-2", label: "1-2" },
+      { value: "3+", label: "3+" },
     ],
   },
   {
-    id: "past_felony_details",
-    label: "If yes, please describe the misdemeanor or felony",
-    type: "text",
-    placeholder: "Provide details here",
-    conditional: (formData: FormData) => formData.past_felony === "yes",
+    id: "misdemeanors_7years",
+    label: "Have you had any misdemeanors in the past 7 years?",
+    type: "button-select",
+    required: true,
+    options: [
+      { value: "none", label: "None" },
+      { value: "1-2", label: "1-2" },
+      { value: "3+", label: "3+" },
+    ],
   },
   {
     id: "speeding_tickets",
     label: "How many speeding tickets have you had in the past 5 years?",
-    type: "select",
-    placeholder: "Select number of tickets",
-    options: [0, 1, 2, 3, 4, "5+"].map((i) => ({ value: i.toString(), label: i.toString() })),
+    type: "button-select",
+    required: true,
+    options: [
+      { value: "0", label: "None" },
+      { value: "1", label: "1 Ticket" },
+      { value: "3+", label: "3+" },
+    ],
   },
   {
     id: "dui",
     label: "Have you had any DUIs or trafficking offenses?",
-    type: "select",
-    placeholder: "Select an option",
+    type: "button-select",
+    required: true,
     options: [
       { value: "yes", label: "Yes" },
       { value: "no", label: "No" },
@@ -101,8 +173,8 @@ export const questions: Question[] = [
   {
     id: "availability",
     label: "How soon are you looking for a delivery opportunity?",
-    type: "select",
-    placeholder: "Select availability",
+    type: "button-select",
+    required: true,
     options: [
       { value: "asap", label: "ASAP" },
       { value: "two_weeks", label: "Two weeks" },

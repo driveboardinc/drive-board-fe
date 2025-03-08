@@ -1,9 +1,12 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { ButtonSelect } from "@/components/ui/button-select";
+import { LocationAutocomplete } from "@/components/ui/location-autocomplete";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,10 +15,11 @@ import { ArrowLeft, ArrowRight, Check, Truck } from "lucide-react";
 import { questions, type Question, type FormData } from "@/constants/questions";
 import { SignupVector } from "@/components/svg-vector/signup-vector";
 import Link from "next/link";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/store/store";
-import { signup } from "@/store/authSlice";
 import { useRouter } from "next/navigation";
+import { useDriverSignupMutation } from "@/store/api/authDriverApiSlice";
+import { useToast } from "@/hooks/useToast";
+import ROUTE from "@/constants/ROUTE";
+import type { Error } from "@/interface/IErrorType";
 
 const getVisibleQuestions = (questions: Question[], formData: FormData) => {
   return questions.filter((question) => {
@@ -25,16 +29,51 @@ const getVisibleQuestions = (questions: Question[], formData: FormData) => {
 };
 
 export default function SignupPage() {
+  const toast = useToast();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [formData, setFormData] = useState<FormData>({ userType: "driver" });
-  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const [driverSignup] = useDriverSignupMutation();
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const visibleQuestions = getVisibleQuestions(questions, formData);
+  const visibleQuestions = [
+    {
+      id: "userType",
+      label: "I am signing up as a:",
+      type: "select",
+      placeholder: "Select user type",
+      options: [
+        { value: "driver", label: "Driver" },
+        { value: "carrier", label: "Carrier" },
+      ],
+    },
+    ...getVisibleQuestions(questions, formData),
+  ];
   const question = visibleQuestions[currentQuestion];
   const progress = ((currentQuestion + 1) / visibleQuestions.length) * 100;
 
+  useEffect(() => {
+    if (
+      question?.type === "text" ||
+      question?.type === "email" ||
+      question?.type === "password" ||
+      question?.type === "number" ||
+      question?.type === "date"
+    ) {
+      inputRef.current?.focus();
+    }
+  }, [question?.type]);
+
   const handleNext = () => {
+    const currentQ = visibleQuestions[currentQuestion];
+    if (currentQ.required && !formData[currentQ.id]) {
+      toast.error({
+        title: "Required Field",
+        description: `Please fill in ${currentQ.label.toLowerCase()} before proceeding.`,
+      });
+      return;
+    }
+
     if (currentQuestion < visibleQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     }
@@ -47,11 +86,31 @@ export default function SignupPage() {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.type === "number" ? Number(e.target.value) : e.target.value,
+    });
   };
 
   const handleSelectChange = (value: string, id: string) => {
     setFormData({ ...formData, [id]: value });
+  };
+
+  const handleButtonSelectChange = (value: string, id: string) => {
+    setFormData({ ...formData, [id]: value });
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleLocationChange = (value: string, locationData: any) => {
+    console.log("Location selected:", value, locationData);
+    setFormData({
+      ...formData,
+      zip_code: value,
+      city: locationData.city,
+      state: locationData.state,
+      location: locationData.formatted_address,
+      locationData: locationData,
+    });
   };
 
   const handleUserTypeChange = (value: string) => {
@@ -59,16 +118,80 @@ export default function SignupPage() {
     router.push(value === "driver" ? "/driver/signup" : "/carrier/signup");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent default form submission on Enter
+      if (currentQuestion === visibleQuestions.length - 1) {
+        handleSubmit(e as unknown as React.FormEvent); // Submit if on the last question
+      } else {
+        handleNext(); // Otherwise, go to the next question
+      }
+    }
+  };
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    dispatch(
-      signup({
+
+    const requiredFields = visibleQuestions.filter((q) => q.required).map((q) => q.id);
+    requiredFields.push("email", "password", "recent_felony", "past_felony"); // Ensure these fields are required
+
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+
+    if (missingFields.length > 0) {
+      toast.error({
+        title: "Missing required fields",
+        description: "Please fill in all required fields before submitting.",
+      });
+      return;
+    }
+
+    try {
+      const response = await driverSignup({
+        ...formData,
         email: formData.email,
         password: formData.password,
-        userType: formData.userType,
-      })
-    );
-  };
+        is_driver: true,
+        is_carrier: false,
+        user: formData.userId, // Ensure this is the correct pk value
+      }).unwrap();
+
+      if (response.email) {
+        toast.success({
+          title: "Sign up successful",
+          description: "Your account has been created. Please sign in to continue.",
+        });
+
+        router.push(ROUTE.DRIVER.SIGNIN);
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+
+      if (err && err.originalStatus) {
+        if (err.originalStatus === 400) {
+          toast.error({
+            title: "Validation Error",
+            description: "Please check your information and try again.",
+          });
+        } else if (err.originalStatus === 409) {
+          toast.error({
+            title: "Account Already Exists",
+            description: "An account with this email already exists. Please sign in instead.",
+          });
+        } else {
+          toast.error({
+            title: "Sign up failed",
+            description: "An unexpected error occurred. Please try again later.",
+          });
+        }
+      } else {
+        toast.error({
+          title: "Sign up failed",
+          description: "An unexpected error occurred. Please try again later.",
+        });
+      }
+      console.error("Signup error:", err);
+    }
+  }
 
   return (
     <div className="w-full h-screen flex items-center overflow-hidden bg-white shadow-xl">
@@ -82,7 +205,7 @@ export default function SignupPage() {
         </div>
 
         <Progress value={progress} className="mb-6" />
-        <form onSubmit={handleSubmit} className="space-y-6 w-full">
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown} className="space-y-6 w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentQuestion}
@@ -126,12 +249,37 @@ export default function SignupPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                  ) : question.type === "button-select" ? (
+                    <ButtonSelect
+                      options={question.options || []}
+                      value={formData[question.id]}
+                      onChange={(value) => handleButtonSelectChange(value, question.id)}
+                      className="mt-2"
+                    />
+                  ) : question.type === "location" ? (
+                    <LocationAutocomplete
+                      id={question.id}
+                      label=""
+                      value={formData.zip_code || ""}
+                      onChange={handleLocationChange}
+                      onLocationSelect={() => {
+                        // Only proceed if we have valid location data
+                        if (formData.city && formData.state) {
+                          handleNext();
+                        }
+                      }}
+                      placeholder={question.placeholder}
+                      required={question.required}
+                    />
                   ) : (
                     <Input
-                      id={question.id}
-                      type={question.type}
+                      type="number"
+                      ref={inputRef}
+                      // id={question.id}
+                      id="experience"
+                      // type={question.type}
                       onChange={handleInputChange}
-                      value={formData[question.id] || ""}
+                      value={formData.experience || ""}
                       placeholder={question.placeholder}
                       required
                       className="w-full h-12"

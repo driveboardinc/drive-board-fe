@@ -21,7 +21,7 @@ import {
   getTotalRecords,
   setPageIndex,
   setPageSize,
-} from '@/feature/slice/paginationSlice';
+} from '@/store/slice/paginationSlice';
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;

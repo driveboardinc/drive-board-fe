@@ -2,7 +2,7 @@
 
 import { redirect, useRouter } from "next/navigation";
 import ROUTE from "@/constants/ROUTE";
-import { useCarrierSignupMutation } from "@/app/api/authCarrierApiSlice";
+import { useCarrierSignupMutation } from "@/store/api/authCarrierApiSlice";
 import { useToast } from "@/hooks/useToast";
 import { Error } from "@/interface/IErrorType";
 import React, { useState } from "react";
@@ -224,6 +224,14 @@ export default function CarrierSignupPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                  ) : currentField.type === "datetime-local" ? (
+                    <Input
+                      className={cn("w-full h-12", errors[currentField.id] && "border-destructive")}
+                      type="datetime-local"
+                      value={formData[currentField.id] || ""}
+                      onChange={(e) => handleInputChange(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                    />
                   ) : (
                     <Input
                       className={cn("w-full h-12", errors[currentField.id] && "border-destructive")}

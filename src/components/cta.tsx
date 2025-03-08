@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 
 export function CallToAction() {
   return (
-    <div className="">
-      <div className="mx-auto max-w-7xl ">
+    <>
+      <div className="mx-auto">
         <div className="relative isolate overflow-hidden bg-gray-900 px-6 py-10 text-center shadow-2xl sm:rounded-3xl sm:px-16">
           <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Ready to transform your transportation business?
@@ -35,6 +35,6 @@ export function CallToAction() {
           </svg>
         </div>
       </div>
-    </div>
+    </>
   );
 }

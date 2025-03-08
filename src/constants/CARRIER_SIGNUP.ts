@@ -1,3 +1,6 @@
+// {"user":["This field is required."]}
+// {"user":["carrier profile with this user already exists."]}
+
 interface ValidationRule {
   pattern?: RegExp;
   minLength?: number;
@@ -10,7 +13,7 @@ export interface CarrierSignupField {
   label: string;
   highlight: string[];
   emoji: string;
-  type: "text" | "email" | "tel" | "select" | "multiselect";
+  type: "text" | "email" | "tel" | "select" | "multiselect" | "password" | "datetime-local";
   options?: string[];
   required: boolean;
   validation?: ValidationRule[];
@@ -38,7 +41,7 @@ export const carrierSignupData = {
       ],
     },
     {
-      id: "mailing_address",
+      id: "company_mailing_address",
       label: "📬 Where should we send important **mail**?",
       highlight: ["mailing address"],
       type: "text",
@@ -48,6 +51,32 @@ export const carrierSignupData = {
         {
           pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
           message: "Please enter a valid email address",
+        },
+      ],
+    },
+    {
+      id: "dot_number",
+      label: "🔢 What's your **DOT number**?",
+      highlight: ["DOT number"],
+      type: "text",
+      required: false,
+      validation: [
+        {
+          pattern: /^[0-9]{5,7}$/,
+          message: "Please enter a valid DOT number (5-7 digits)",
+        },
+      ],
+    },
+    {
+      id: "mc_number",
+      label: "🔢 What's your **MC number**?",
+      highlight: ["MC number"],
+      type: "text",
+      required: false,
+      validation: [
+        {
+          pattern: /^[0-9]{5,6}$/,
+          message: "Please enter a valid MC number (5-6 digits)",
         },
       ],
     },
@@ -66,8 +95,8 @@ export const carrierSignupData = {
     },
     {
       id: "representative_name",
-      label: "👤 Who's your **company rep** for DriveBoard?",
-      highlight: ["company rep"],
+      label: "👤 Who is the **Representative** for your Drive Board Account?",
+      highlight: ["Representative"],
       type: "text",
       required: true,
       validation: [
@@ -125,19 +154,62 @@ export const carrierSignupData = {
       label: "🌎 Where was your company **formed**?",
       highlight: ["formed"],
       type: "select",
-      options: ["Alabama", "Alaska", "Arizona" /* Add all US states */],
+      options: [
+        "Alabama",
+        "Alaska",
+        "Arizona",
+        "Arkansas",
+        "California",
+        "Colorado",
+        "Connecticut",
+        "Delaware",
+        "Florida",
+        "Georgia",
+        "Hawaii",
+        "Idaho",
+        "Illinois",
+        "Indiana",
+        "Iowa",
+        "Kansas",
+        "Kentucky",
+        "Louisiana",
+        "Maine",
+        "Maryland",
+        "Massachusetts",
+        "Michigan",
+        "Minnesota",
+        "Mississippi",
+        "Missouri",
+        "Montana",
+        "Nebraska",
+        "Nevada",
+        "New Hampshire",
+        "New Jersey",
+        "New Mexico",
+        "New York",
+        "North Carolina",
+        "North Dakota",
+        "Ohio",
+        "Oklahoma",
+        "Oregon",
+        "Pennsylvania",
+        "Rhode Island",
+        "South Carolina",
+        "South Dakota",
+        "Tennessee",
+        "Texas",
+        "Utah",
+        "Vermont",
+        "Virginia",
+        "Washington",
+        "West Virginia",
+        "Wisconsin",
+        "Wyoming",
+      ],
       required: true,
     },
     {
-      id: "operation_areas",
-      label: "🚚 Where do you **operate**?",
-      highlight: ["operate"],
-      type: "multiselect",
-      options: ["Northeast", "Southeast", "Midwest", "Southwest", "West Coast", "Northwest"],
-      required: true,
-    },
-    {
-      id: "formation_state",
+      id: "specific_states",
       label: "🏛️ Where was your company **formed**?", // Changed emoji to be more relevant
       highlight: ["formed"],
       type: "select",
@@ -193,6 +265,28 @@ export const carrierSignupData = {
         "Wisconsin",
         "Wyoming",
       ],
+      required: true,
+    },
+    {
+      id: "best_time_to_call",
+      label: "🕒 When's the **best time to call** you?",
+      highlight: ["best time to call"],
+      type: "datetime-local",
+      required: true,
+      validation: [
+        {
+          pattern: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/,
+          message: "Please select a valid date and time",
+        },
+      ],
+    },
+
+    {
+      id: "hiring_preferences",
+      label: "👥 What are your **hiring preferences**?",
+      highlight: ["hiring preferences"],
+      type: "multiselect",
+      options: ["Full-time", "Part-time", "Contract", "Seasonal"],
       required: true,
     },
   ] as CarrierSignupField[],

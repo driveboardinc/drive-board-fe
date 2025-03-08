@@ -11,21 +11,32 @@ import { SigninVector } from "@/components/svg-vector/signin-vector";
 import { Icons } from "@/components/icon";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@/store/store";
-import { signin } from "@/store/authSlice";
+import { useSignInMutation } from "@/store/api/authDriverApiSlice";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
+import type { RootState } from "@/lib/store";
+import { useToast } from "@/hooks/useToast";
+import { setCredentials } from "@/store/slice/authSlice";
+import type { Error } from "@/interface/IErrorType";
+import { setAuthCookies } from "@/utils/auth";
 
 export default function SigninPage() {
-  const [formData, setFormData] = useState({ email: "", password: "", userType: "driver" });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    userType: "driver",
+  });
+  const [driverSignin] = useSignInMutation();
+  const dispatch = useDispatch();
+  const toast = useToast();
   const error = useSelector((state: RootState) => state.auth.error);
-  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/driver-dashboard");
+      // Redirect to subscription plans page instead of directly to driver dashboard
+      router.push("/subscription-plans");
     }
   }, [isAuthenticated, router]);
 
@@ -40,13 +51,52 @@ export default function SigninPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(
-      signin({
+    try {
+      const response = await driverSignin({
         email: formData.email,
         password: formData.password,
-        userType: formData.userType,
-      })
-    );
+        is_carrier: false,
+        is_driver: true,
+      }).unwrap();
+
+      if (response.access && response.refresh && response.user) {
+        const formattedResponse = {
+          access: response.access,
+          refresh: response.refresh,
+          user_id: response.user.id,
+          username: response.user.email.split("@")[0], // Assuming username can be derived from email
+          email: response.user.email,
+          is_driver: response.user.is_driver,
+          is_carrier: response.user.is_carrier,
+          is_verified: true, // Set this based on your actual API response if available
+        };
+
+        await setAuthCookies(response.access, response.refresh);
+        dispatch(setCredentials(formattedResponse));
+
+        toast.success({
+          title: "Sign in successful",
+          description: "You have successfully signed in",
+        });
+
+        // Redirect to subscription plans page instead of directly to driver dashboard
+        router.push("/subscription-plans");
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      if (err.originalStatus === 401 || err.originalStatus === 403) {
+        toast.error({
+          title: "Authentication failed",
+          description: "Invalid email or password. Please try again.",
+        });
+      } else {
+        toast.error({
+          title: "Sign in failed",
+          description: "An error occurred. Please try again later.",
+        });
+      }
+      console.error("Sign in error:", error);
+    }
   };
 
   return (

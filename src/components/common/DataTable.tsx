@@ -24,7 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useSelector } from 'react-redux';
-import { getFilters, getIsLoading } from '@/feature/slice/paginationSlice';
+import { getFilters, getIsLoading } from '@/store/slice/paginationSlice';
 import { DataTablePagination } from './DataTablePagination';
 
 interface DataTableProps<TData, TValue> {

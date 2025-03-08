@@ -25,6 +25,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Dry Van"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "2",
@@ -53,6 +56,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Reefer"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "3",
@@ -81,6 +87,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Reefer"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "4",
@@ -108,6 +117,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Hazmat"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "5",
@@ -135,6 +147,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Flatbed"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "6",
@@ -162,6 +177,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Dry Van"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "7",
@@ -189,6 +207,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Dry Van"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "8",
@@ -216,6 +237,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Hazmat"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "9",
@@ -243,6 +267,9 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Flatbed"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
   {
     id: "10",
@@ -269,5 +296,8 @@ export const mock_jobs = [
     customized_pre_screening: [],
     qualifications: ["Valid CDL", "Clean driving record"],
     application_method: "Direct",
+    freight_type: ["Dry Van"],
+    vehicle_type: ["Truck"],
+    home_time: ["Weekly"],
   },
 ];
