@@ -1,32 +1,32 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { BellSVG } from '@/assets/svg/Bell';
-import { HelpSVG } from '@/assets/svg/HelpIcon';
-import { MessagesSVG } from '@/assets/svg/Messages';
-import { CarrierSidebar } from '@/components/carrier/sidebar/Sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { useRouter } from "next/navigation";
+import { BellSVG } from "@/assets/svg/Bell";
+import { HelpSVG } from "@/assets/svg/HelpIcon";
+import { MessagesSVG } from "@/assets/svg/Messages";
+import { CarrierSidebar } from "@/components/carrier/sidebar/Sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Settings, LogOut } from 'lucide-react';
-import { withCarrierAuth } from '@/components/auth/hocs/withCarrierAuth';
-import { useDispatch } from 'react-redux';
-import { logout, setLoggingOut } from '@/store/slice/authSlice';
+} from "@/components/ui/dropdown-menu";
+import { Settings, LogOut } from "lucide-react";
+// import { withCarrierAuth } from "@/components/auth/hocs/withCarrierAuth";
+import { useDispatch } from "react-redux";
+import { logout, setLoggingOut } from "@/store/slice/authSlice";
 
-function CarrierLayout({ children }: { children: React.ReactNode }) {
+export default function CarrierLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const dispatch = useDispatch();
 
   const handleLogout = () => {
     dispatch(setLoggingOut(true));
     dispatch(logout());
-    router.push('/carrier/signin');
+    router.push("/carrier/signin");
   };
 
   return (
@@ -66,10 +66,7 @@ function CarrierLayout({ children }: { children: React.ReactNode }) {
                       <Settings className="mr-2 h-4 w-4" />
                       Profile Settings
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="cursor-pointer"
-                      onClick={handleLogout}
-                    >
+                    <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
                     </DropdownMenuItem>
@@ -90,4 +87,4 @@ function CarrierLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default withCarrierAuth(CarrierLayout);
+// export default withCarrierAuth(CarrierLayout);
