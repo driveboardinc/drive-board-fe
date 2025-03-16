@@ -1,22 +1,43 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
-import { AlertTriangle, DollarSign, Trophy } from 'lucide-react';
+import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertTriangle, DollarSign, Trophy } from "lucide-react";
 
-export default function SponsoredJobAd() {
+interface SponsoredJobAdProps {
+  onSave?: (data: { isSponsored: boolean; badges: string[]; isPremier: boolean }) => void;
+}
+
+export default function SponsoredJobAd({ onSave }: SponsoredJobAdProps) {
   const [isSponsored, setIsSponsored] = useState(false);
   const [isPremier, setIsPremier] = useState(false);
   const [badges, setBadges] = useState<string[]>([]);
 
+  const handleSponsoredChange = (value: string) => {
+    const newValue = value === "yes";
+    setIsSponsored(newValue);
+    onSave?.({ isSponsored: newValue, badges, isPremier });
+  };
+
+  const handlePremierChange = (value: string) => {
+    const newValue = value === "yes";
+    setIsPremier(newValue);
+    onSave?.({ isSponsored, badges, isPremier: newValue });
+  };
+
   const handleBadgeChange = (badge: string) => {
+    let newBadges: string[];
     if (badges.includes(badge)) {
-      setBadges(badges.filter((b) => b !== badge));
+      newBadges = badges.filter((b) => b !== badge);
     } else if (badges.length < 2) {
-      setBadges([...badges, badge]);
+      newBadges = [...badges, badge];
+    } else {
+      return;
     }
+    setBadges(newBadges);
+    onSave?.({ isSponsored, badges: newBadges, isPremier });
   };
 
   return (
@@ -28,10 +49,7 @@ export default function SponsoredJobAd() {
         <p className="text-sm text-muted-foreground mb-2">
           Cost: $60 per Job Ad, sent daily to each driver in the area.
         </p>
-        <RadioGroup
-          value={isSponsored ? 'yes' : 'no'}
-          onValueChange={(value: string) => setIsSponsored(value === 'yes')}
-        >
+        <RadioGroup value={isSponsored ? "yes" : "no"} onValueChange={handleSponsoredChange}>
           <div className="flex space-x-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="yes" id="sponsor-yes" />
@@ -52,14 +70,11 @@ export default function SponsoredJobAd() {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="badge-urgent"
-                checked={badges.includes('urgent')}
-                onCheckedChange={() => handleBadgeChange('urgent')}
-                disabled={badges.length === 2 && !badges.includes('urgent')}
+                checked={badges.includes("urgent")}
+                onCheckedChange={() => handleBadgeChange("urgent")}
+                disabled={badges.length === 2 && !badges.includes("urgent")}
               />
-              <Label
-                htmlFor="badge-urgent"
-                className="flex items-center space-x-2"
-              >
+              <Label htmlFor="badge-urgent" className="flex items-center space-x-2">
                 <AlertTriangle className="h-4 w-4" />
                 <span>Urgent</span>
               </Label>
@@ -67,14 +82,11 @@ export default function SponsoredJobAd() {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="badge-high-pay"
-                checked={badges.includes('high-pay')}
-                onCheckedChange={() => handleBadgeChange('high-pay')}
-                disabled={badges.length === 2 && !badges.includes('high-pay')}
+                checked={badges.includes("high-pay")}
+                onCheckedChange={() => handleBadgeChange("high-pay")}
+                disabled={badges.length === 2 && !badges.includes("high-pay")}
               />
-              <Label
-                htmlFor="badge-high-pay"
-                className="flex items-center space-x-2"
-              >
+              <Label htmlFor="badge-high-pay" className="flex items-center space-x-2">
                 <DollarSign className="h-4 w-4" />
                 <span>HIGH PAY</span>
               </Label>
@@ -82,16 +94,11 @@ export default function SponsoredJobAd() {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="badge-top-company"
-                checked={badges.includes('top-company')}
-                onCheckedChange={() => handleBadgeChange('top-company')}
-                disabled={
-                  badges.length === 2 && !badges.includes('top-company')
-                }
+                checked={badges.includes("top-company")}
+                onCheckedChange={() => handleBadgeChange("top-company")}
+                disabled={badges.length === 2 && !badges.includes("top-company")}
               />
-              <Label
-                htmlFor="badge-top-company"
-                className="flex items-center space-x-2"
-              >
+              <Label htmlFor="badge-top-company" className="flex items-center space-x-2">
                 <Trophy className="h-4 w-4" />
                 <span>TOP COMPANY</span>
               </Label>
@@ -102,13 +109,8 @@ export default function SponsoredJobAd() {
 
       <div>
         <Label>Would you like a Premier Job Posting?</Label>
-        <p className="text-sm text-muted-foreground mb-2">
-          Cost: $99 per Job Listing
-        </p>
-        <RadioGroup
-          value={isPremier ? 'yes' : 'no'}
-          onValueChange={(value: string) => setIsPremier(value === 'yes')}
-        >
+        <p className="text-sm text-muted-foreground mb-2">Cost: $99 per Job Listing</p>
+        <RadioGroup value={isPremier ? "yes" : "no"} onValueChange={handlePremierChange}>
           <div className="flex space-x-4">
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="yes" id="premier-yes" />

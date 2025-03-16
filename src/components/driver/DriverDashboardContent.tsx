@@ -4,16 +4,45 @@ import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "react-responsive";
-import { mock_jobs } from "@/constants/mockData";
 import { JobSearch } from "@/components/driver/JobSearch";
 import { JobCard } from "@/components/driver/JobCard";
 import { JobDetails } from "@/components/driver/JobDetails";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, X } from "lucide-react";
-import type { Job, SortOption } from "@/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { experienceLevelOptions, vehicleTypes } from "@/schema/jobPostSchema";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+
+interface JobResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Job[];
+}
+
+interface Job {
+  id: number;
+  title: string;
+  no_of_openings: number;
+  country: string;
+  location: string;
+  shift: string;
+  job_type_names: string[];
+  experience_level_names: string[];
+  application_method_names: string[];
+  language_names: string[];
+  working_days: string;
+  min_pay: string;
+  max_pay: string;
+  description: string;
+  require_resume: boolean;
+  application_updates: boolean;
+  allow_contact: boolean;
+  fair_chance_hiring: boolean;
+  background_check_required: boolean;
+}
 
 export function DriverDashboardContent() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -26,31 +55,51 @@ export function DriverDashboardContent() {
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const [experienceFilter, setExperienceFilter] = useState<string>("All");
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<string>("All");
-  const [sortBy, setSortBy] = useState<SortOption>("date");
+  const [sortBy, setSortBy] = useState<"date" | "pay" | "az" | "location">("date");
+  const { accessToken } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const fetchJobs = async () => {
       setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setJobs(mock_jobs);
-      setFilteredJobs(mock_jobs);
-      if (mock_jobs.length > 0) {
-        setSelectedJob(mock_jobs[0]);
+      try {
+        const response = await fetch(
+          "http://ec2-44-211-136-154.compute-1.amazonaws.com:8000/api/jobs_feed/",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch jobs");
+        }
+
+        const data: JobResponse = await response.json();
+        setJobs(data.results);
+        setFilteredJobs(data.results);
+        if (data.results.length > 0) {
+          setSelectedJob(data.results[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     fetchJobs();
-  }, []);
+  }, [accessToken]);
 
   useEffect(() => {
     const filtered = jobs.filter((job) => {
-      const matchesSearch =
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.carrier.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesLocation = job.location.toLowerCase().includes(locationTerm.toLowerCase());
-      const matchesExperience = experienceFilter === "All" || job.experience_level === experienceFilter;
-      const matchesVehicleType = vehicleTypeFilter === "All" || job.vehicle_type.includes(vehicleTypeFilter);
+      const matchesExperience =
+        experienceFilter === "All" || job.experience_level_names.includes(experienceFilter);
+      // Note: vehicle type filter might need adjustment since it's not in the API response
+      const matchesVehicleType = vehicleTypeFilter === "All";
 
       return matchesSearch && matchesLocation && matchesExperience && matchesVehicleType;
     });
@@ -59,14 +108,12 @@ export function DriverDashboardContent() {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "pay":
-          return b.salary - a.salary;
-        case "date":
-          return new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime();
+          return parseFloat(b.max_pay) - parseFloat(a.max_pay);
         case "az":
           return a.title.localeCompare(b.title);
         case "location":
           return a.location.localeCompare(b.location);
-        default:
+        default: // date case would go here if we had posting dates
           return 0;
       }
     });

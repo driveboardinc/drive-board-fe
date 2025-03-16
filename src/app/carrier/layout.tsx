@@ -15,13 +15,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut } from "lucide-react";
-// import { withCarrierAuth } from "@/components/auth/hocs/withCarrierAuth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout, setLoggingOut } from "@/store/slice/authSlice";
+import { RootState } from "@/store/store";
 
 export default function CarrierLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const dispatch = useDispatch();
+  const auth = useSelector((state: RootState) => state.auth);
+
+  console.log("Carrier Layout - Auth State:", {
+    isAuthenticated: auth.isAuthenticated,
+    accessToken: auth.accessToken?.substring(0, 20) + "...",
+    user: auth.user,
+    timestamp: new Date().toISOString(),
+  });
 
   const handleLogout = () => {
     dispatch(setLoggingOut(true));
@@ -86,5 +94,3 @@ export default function CarrierLayout({ children }: { children: React.ReactNode 
     </SidebarProvider>
   );
 }
-
-// export default withCarrierAuth(CarrierLayout);

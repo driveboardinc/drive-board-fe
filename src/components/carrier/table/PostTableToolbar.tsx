@@ -1,113 +1,58 @@
-import { Table } from '@tanstack/react-table';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { useDispatch } from 'react-redux';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Table } from "@tanstack/react-table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { DataTableViewOptions } from "@/components/common/DataTableViewOptions";
+import { useDispatch } from "react-redux";
+import { setFilters } from "@/store/slice/paginationSlice";
+import { postFilterConfig } from "./PostTableConfig";
+import { TablePost } from "@/schema/postSchema";
 
-import {
-  resetPagination,
-  setFilters,
-  setPageIndex,
-  setRefetchData,
-} from '@/store/slice/paginationSlice';
-import { DataTableFacetedFilter } from '@/components/common/DataTableFacetedFilter';
-import { DataTableViewOptions } from '@/components/common/DataTableViewOptions';
-import { facetConfig, postFilterConfig } from './PostTableConfig';
-import { JobPostForm } from './JobPostForm';
-import { debounce } from '@/lib/debounce';
-import { AddEntityButton } from '@/components/ui/AddEntityButton';
-
-interface PostTableToolbarProps<TData> {
+interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
 
-export function PostTableToolbar<TData>({
-  table,
-}: PostTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
+export function PostTableToolbar({ table }: DataTableToolbarProps<TablePost>) {
   const dispatch = useDispatch();
-  const [filtersState, setFiltersState] = useState<{ [key: string]: string }>(
-    {}
-  );
-  const debounceRef = useRef<ReturnType<typeof debounce> | null>(null);
 
-  useEffect(() => {
-    if (!isFiltered) {
-      setFiltersState({});
-    }
-  }, [isFiltered]);
-  const debouncedSetFilters = useMemo(() => {
-    const debouncedFunction = debounce((key: string, value: string) => {
-      dispatch(setFilters({ id: key, value }));
-    }, 500);
-
-    debounceRef.current = debouncedFunction;
-    return debouncedFunction;
-  }, [dispatch]);
-
-  const handleInputChange =
-    (key: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      dispatch(setPageIndex({ pageIndex: 1 }));
-      const newValue = event.target.value;
-      setFiltersState((prev) => ({ ...prev, [key]: newValue }));
-      debouncedSetFilters(key, newValue);
-    };
-
-  const handleReset = () => {
-    table.resetColumnFilters();
-    dispatch(resetPagination());
-    dispatch(setRefetchData());
-
-    if (debounceRef.current) {
-      debounceRef.current.cancel();
-    }
-  };
+  const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
-    <>
-      <div className="grid grid-cols-1 md:flex items-center justify-between gap-2 mt-4 px-1">
-        {postFilterConfig.map(({ placeholder, key }) => (
+    <div className="flex items-center justify-between">
+      <div className="flex flex-1 items-center space-x-2">
+        {postFilterConfig.map((config) => (
           <Input
-            key={key}
-            placeholder={placeholder}
-            value={filtersState[key] || ''}
-            onChange={handleInputChange(key)}
-            className="h-8"
+            key={config.key}
+            placeholder={config.placeholder}
+            value={(table.getColumn(config.key)?.getFilterValue() as string) ?? ""}
+            onChange={(event) => {
+              table.getColumn(config.key)?.setFilterValue(event.target.value);
+              dispatch(
+                setFilters({
+                  filters: {
+                    [config.key]: event.target.value,
+                  },
+                })
+              );
+            }}
+            className="h-8 w-[150px] lg:w-[250px]"
           />
         ))}
-
-        {facetConfig.map(({ key, title, options }) =>
-          table.getColumn(key) ? (
-            <DataTableFacetedFilter
-              key={key}
-              column={table.getColumn(key)}
-              title={title}
-              options={options}
-            />
-          ) : null
-        )}
-
         {isFiltered && (
           <Button
-            variant="secondary"
-            onClick={handleReset}
-            className="h-8 px-2 lg:px-3 text-foreground"
+            variant="ghost"
+            onClick={() => {
+              table.resetColumnFilters();
+              dispatch(setFilters({ filters: {} }));
+            }}
+            className="h-8 px-2 lg:px-3"
           >
             Reset
             <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
         )}
-        <div className="flex flex-col md:flex-row gap-2">
-          <DataTableViewOptions table={table} />
-          <AddEntityButton
-            FormComponent={JobPostForm}
-            buttonLabel="Add Job Post"
-            dialogTitle="Add Job Post"
-            dialogDescription="Add the job post details below by changing values."
-          />
-        </div>
       </div>
-    </>
+      <DataTableViewOptions table={table} />
+    </div>
   );
 }

@@ -1,10 +1,9 @@
 "use client";
 
-import { redirect, useRouter } from "next/navigation";
-import ROUTE from "@/constants/ROUTE";
+import { useRouter } from "next/navigation";
+import { ROUTE } from "@/constants/ROUTE";
 import { useCarrierSignupMutation } from "@/store/api/authCarrierApiSlice";
 import { useToast } from "@/hooks/useToast";
-import { Error } from "@/interface/IErrorType";
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -77,24 +76,78 @@ export default function CarrierSignupPage() {
     }
 
     try {
-      const response = await carrierSignup({
-        ...formData,
-        is_carrier: true,
+      // First create the user account
+      const userResponse = await carrierSignup({
+        email: formData.representative_email,
+        password: formData.password,
       }).unwrap();
-      if (response.email) {
-        toast.success({
-          title: "Signup successful",
-          description: "You have successfully signed up",
+
+      console.log("User response:", userResponse);
+
+      if (userResponse.email) {
+        // Get the access token by signing in
+        const loginResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.representative_email,
+            password: formData.password,
+          }),
         });
-        redirect(ROUTE.CARRIER.SIGNIN);
+
+        const loginData = await loginResponse.json();
+
+        if (loginResponse.ok && loginData.access) {
+          // Then create the carrier profile
+          const profileResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/carrier/profile/create/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${loginData.access}`,
+              },
+              body: JSON.stringify({
+                user: userResponse.id,
+                company_name: formData.company_name,
+                company_mailing_address: formData.company_mailing_address,
+                phone_number: formData.representative_phone,
+                dot_mc_number: formData.dot_mc_number,
+                representative_name: formData.representative_name,
+                representative_email: formData.representative_email,
+                representative_phone: formData.representative_phone,
+                formation_state: formData.formation_state,
+                operating_areas: "nationwide",
+                specific_states: formData.specific_states || null,
+                best_time_to_call: formData.best_time_to_call,
+                hiring_preferences: formData.hiring_preferences || "all",
+              }),
+            }
+          );
+
+          if (profileResponse.ok) {
+            toast.success({
+              title: "Signup successful",
+              description: "You have successfully signed up",
+            });
+            router.push(ROUTE.CARRIER.SIGNIN);
+          } else {
+            const errorData = await profileResponse.json();
+            console.error("Profile creation error:", errorData);
+            throw new Error("Profile creation failed");
+          }
+        } else {
+          throw new Error("Failed to get access token");
+        }
       }
     } catch (error: unknown) {
-      if ((error as Error).originalStatus === 403) {
-        toast.error({
-          title: "Signup failed",
-          description: "Something went wrong. Please try again.",
-        });
-      }
+      console.error("Signup error:", error);
+      toast.error({
+        title: "Signup failed",
+        description: error instanceof Error ? error.message : "Something went wrong. Please try again.",
+      });
     }
   };
 

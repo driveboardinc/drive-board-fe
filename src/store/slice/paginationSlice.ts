@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ColumnFilter, ColumnSort } from '@tanstack/react-table';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ColumnFilter, ColumnSort } from "@tanstack/react-table";
 
 export interface PaginationState {
   pagination: {
@@ -28,7 +28,7 @@ const initialState: PaginationState = {
 };
 
 const tablePaginationSlice = createSlice({
-  name: 'pageDetails',
+  name: "pageDetails",
   initialState: initialState,
   reducers: {
     setPaginationDetails: (
@@ -87,44 +87,26 @@ const tablePaginationSlice = createSlice({
     setFilters: (
       state,
       action: PayloadAction<{
-        id: string;
-        value: string;
+        filters: Record<string, string>;
       }>
     ) => {
-      const { id, value } = action.payload;
-
-      if (state.filters) {
-        if (id && value) {
-          const filterIndex = state.filters.findIndex(
-            (filter) => filter.id === id
-          );
-
-          if (filterIndex !== -1) {
-            state.filters[filterIndex].value = value;
-          } else {
-            state.filters.push({ id, value });
-          }
-        } else {
-          if (id) {
-            state.filters = state.filters.filter((filter) => filter.id !== id);
-          }
-        }
-      } else {
-        state.filters = [{ id, value }];
-      }
+      state.filters = Object.entries(action.payload.filters).map(([id, value]) => ({
+        id,
+        value,
+      }));
     },
 
     setSorting: (
       state,
       action: PayloadAction<{
         name: string;
-        order: 'asc' | 'desc' | '';
+        order: "asc" | "desc" | "";
       }>
     ) => {
       const { name, order } = action.payload;
-      const isDescending = order === 'desc';
+      const isDescending = order === "desc";
 
-      if (order === '') {
+      if (order === "") {
         state.sorting = state.sorting.filter((sort) => sort.id !== name);
         return;
       }

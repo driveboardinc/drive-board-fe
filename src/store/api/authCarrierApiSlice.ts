@@ -1,27 +1,34 @@
-import { API_ENDPOINT, ROOT_API } from '@/constants/API_ENDPOINT';
-import { apiSlice } from './apiSlice';
-
-const authPath = `${ROOT_API}`;
+import { apiSlice } from "./apiSlice";
 
 export const authCarrierApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     carrierSignup: builder.mutation({
-      query: (signupData) => ({
-        url: `${authPath}${API_ENDPOINT.CARRIER.SIGNUP}`,
-        method: 'POST',
-        body: signupData,
+      query: (credentials) => ({
+        url: "/signup/",
+        method: "POST",
+        body: {
+          email: credentials.email,
+          password: credentials.password,
+          is_carrier: true,
+          is_driver: false,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
       }),
     }),
-
-    signIn: builder.mutation({
+    carrierSignin: builder.mutation({
       query: (credentials) => ({
-        url: `${authPath}${API_ENDPOINT.CARRIER.SIGNIN}`,
-        method: 'POST',
+        url: "/login/",
+        method: "POST",
         body: credentials,
+        headers: {
+          "Content-Type": "application/json",
+        },
       }),
     }),
   }),
+  overrideExisting: false,
 });
 
-export const { useCarrierSignupMutation, useSignInMutation } =
-  authCarrierApiSlice;
+export const { useCarrierSignupMutation, useCarrierSigninMutation } = authCarrierApiSlice;

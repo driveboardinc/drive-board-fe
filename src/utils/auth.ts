@@ -1,14 +1,15 @@
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
-export const setAuthCookies = (access: string, refresh: string) => {
-  Cookies.set('accessToken', access, { secure: true });
-  Cookies.set('refreshToken', refresh, { secure: true });
+export const setAuthCookies = async (access: string, refresh: string, userType: string) => {
+  document.cookie = `accessToken=${access}; path=/`;
+  document.cookie = `refreshToken=${refresh}; path=/`;
+  document.cookie = `userType=${userType}; path=/`;
 };
 
 export const clearAuthCookies = () => {
-  Cookies.remove('accessToken');
-  Cookies.remove('refreshToken');
+  Cookies.remove("accessToken");
+  Cookies.remove("refreshToken");
 };
 
-export const getAccessToken = () => Cookies.get('accessToken');
-export const getRefreshToken = () => Cookies.get('refreshToken');
+export const getAccessToken = () => Cookies.get("accessToken");
+export const getRefreshToken = () => Cookies.get("refreshToken");

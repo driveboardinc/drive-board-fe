@@ -1,26 +1,31 @@
-'use client';
+"use client";
 
-import { notFound, redirect } from 'next/navigation';
-import { useSelector } from 'react-redux';
-import {
-  selectCurrentUser,
-  selectIsAuthenticated,
-  selectIsLoggingOut,
-} from '@/store/slice/authSlice';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { ROUTE } from "@/constants/ROUTE";
 
-export function withCarrierAuth<P extends object>(
-  WrappedComponent: React.ComponentType<P>
-) {
+export function withCarrierAuth<P extends object>(WrappedComponent: React.ComponentType<P>) {
   return function WithCarrierAuthComponent(props: P) {
-    const isAuthenticated = useSelector(selectIsAuthenticated);
-    const user = useSelector(selectCurrentUser);
-    const isLoggingOut = useSelector(selectIsLoggingOut);
+    const router = useRouter();
+    const auth = useSelector((state: RootState) => state.auth);
 
-    if (!isAuthenticated || !user?.is_carrier) {
-      if (isLoggingOut) {
-        redirect('/carrier/signin');
+    console.log("WithCarrierAuth HOC - Auth State:", {
+      isAuthenticated: auth.isAuthenticated,
+      accessToken: auth.accessToken,
+      user: auth.user,
+    });
+
+    useEffect(() => {
+      if (!auth.isAuthenticated || !auth.accessToken) {
+        console.log("Not authenticated, redirecting to signin");
+        router.push(ROUTE.CARRIER.SIGNIN);
       }
-      notFound();
+    }, [auth.isAuthenticated, auth.accessToken, router]);
+
+    if (!auth.isAuthenticated || !auth.accessToken) {
+      return null;
     }
 
     return <WrappedComponent {...props} />;

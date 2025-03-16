@@ -17,20 +17,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  logout as logoutAction,
-  setLoggingOut,
-  selectCurrentUser,
-  selectIsLoggingOut,
-} from "@/store/slice/authSlice";
+import { logout as logoutAction, setLoggingOut, selectIsLoggingOut } from "@/store/slice/authSlice";
 import type { AppDispatch } from "@/lib/store"; // Make sure this path is correct
+import { RootState } from "@/store/store";
 
 const DriverDashboardHeader: React.FC = () => {
   const router = useRouter();
   const { success, error } = useToast(); // ✅ Fix here
   const dispatch = useDispatch<AppDispatch>();
   const [isOpen, setIsOpen] = useState(false);
-  const user = useSelector(selectCurrentUser);
+  const user = useSelector((state: RootState) => state.auth.user);
   const isLoggingOut = useSelector(selectIsLoggingOut);
 
   const handleLogout = async () => {
@@ -78,7 +74,10 @@ const DriverDashboardHeader: React.FC = () => {
               </Link>
             </li>
             <li>
-              <Link href="#" className="text-sm text-gray-600 hover:text-[#6B5ECD] transition-colors">
+              <Link
+                href="/driver/load-board"
+                className="text-sm text-gray-600 hover:text-[#6B5ECD] transition-colors"
+              >
                 Load Board
               </Link>
             </li>
@@ -112,7 +111,7 @@ const DriverDashboardHeader: React.FC = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href="/profile-settings" className="w-full">
+              <Link href="/driver/profile-settings" className="w-full">
                 Profile Settings
               </Link>
             </DropdownMenuItem>

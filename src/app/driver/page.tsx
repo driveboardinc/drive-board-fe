@@ -1,5 +1,10 @@
-import { DriverDashboardContent } from "@/components/driver/DriverDashboardContent";
+"use client";
 
-export default function DriverDashboardPage() {
+import { DriverDashboardContent } from "@/components/driver/DriverDashboardContent";
+import { withDriverAuth } from "@/components/auth/hocs/withDriverAuth";
+
+function DriverDashboardPage() {
   return <DriverDashboardContent />;
 }
+
+export default withDriverAuth(DriverDashboardPage);

@@ -10,11 +10,10 @@ import { Phone, Mail, MapPin, Clock, Send, Loader2, CheckCircle } from "lucide-r
 import { useFormState, useFormStatus } from "react-dom";
 import { submitContactForm, type ContactFormState } from "@/actions/contact";
 import { useEffect, useState } from "react";
-import { toast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { useToast } from "@/hooks/useToast";
 
 const ContactInfo = ({ icon, title, details }: { icon: React.ReactNode; title: string; details: string }) => (
   <div className="flex items-center space-x-4 mb-6">
@@ -49,31 +48,27 @@ function SubmitButton() {
 export default function Contact() {
   const [formState, formAction] = useFormState(submitContactForm, {} as ContactFormState);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
+  const toast = useToast();
   useEffect(() => {
     if (formState.success) {
       setShowSuccessMessage(true);
-      toast({
+      toast.success({
         title: "Message sent successfully!",
         description: "We'll get back to you as soon as possible.",
-        action: <ToastAction altText="Close">Close</ToastAction>,
       });
 
-      // Hide success message after 5 seconds
       const timer = setTimeout(() => {
         setShowSuccessMessage(false);
       }, 5000);
 
       return () => clearTimeout(timer);
     } else if (formState.errors?._form) {
-      toast({
-        variant: "destructive",
+      toast.error({
         title: "Error",
         description: formState.errors._form[0],
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
     }
-  }, [formState]);
+  }, [formState, toast]);
 
   return (
     <>

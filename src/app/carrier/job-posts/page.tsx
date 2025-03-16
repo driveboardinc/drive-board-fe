@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import DataTable from '@/components/common/DataTable';
-import { useDispatch, useSelector } from 'react-redux';
+import DataTable from "@/components/common/DataTable";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getFilters,
   getPagination,
   getSorting,
   setIsLoading,
   setPaginationDetails,
-} from '@/store/slice/paginationSlice';
-import { useEffect } from 'react';
-import { useGetJobPostsQuery } from '@/store/api/jobPostApiSlice';
-import { postColumns } from '@/components/carrier/table/PostTableConfig';
-import { PostTableToolbar } from '@/components/carrier/table/PostTableToolbar';
+} from "@/store/slice/paginationSlice";
+import { useEffect } from "react";
+import { useGetJobPostsQuery } from "@/store/api/jobPostApiSlice";
+import { postColumns } from "@/components/carrier/table/PostTableConfig";
+import { PostTableToolbar } from "@/components/carrier/table/PostTableToolbar";
 
 export default function JobListPage() {
   const dispatch = useDispatch();
@@ -26,12 +26,13 @@ export default function JobListPage() {
     filters: filters,
     sorting: sorting,
   });
+
   useEffect(() => {
     dispatch(setIsLoading({ loadingStatus: isFetching }));
   }, [isFetching, dispatch]);
 
   useEffect(() => {
-    if (postsResponse?.success) {
+    if (postsResponse?.data) {
       dispatch(
         setPaginationDetails({
           pagination: postsResponse.data.pagination,
