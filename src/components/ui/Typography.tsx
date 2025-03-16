@@ -1,81 +1,39 @@
-import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
+import { VariantProps, cva } from "class-variance-authority";
+import { HTMLAttributes, forwardRef } from "react";
 
-const typographyVariants = cva('text-base', {
+const typographyVariants = cva("", {
   variants: {
     variant: {
-      heading1: 'text-3xl md:text-4xl lg:text-5xl font-bold text-primary',
-      heading2: 'text-3xl font-bold text-primary',
-      heading3: 'text-2xl font-bold text-primary',
-      heading4: 'text-xl font-bold text-primary',
-      heading5: 'text-lg font-bold text-primary',
-      heading6: 'text-base font-bold text-primary',
-      paragraph: 'text-base',
-      caption: 'text-sm italic',
-    },
-    color: {
-      primary: 'text-primary',
-      secondary: 'text-secondary',
-      accent: 'text-accent',
-      foreground: 'text-foreground',
-    },
-    tag: {
-      h1: 'h1',
-      h2: 'h2',
-      h3: 'h3',
-      h4: 'h4',
-      h5: 'h5',
-      h6: 'h6',
-      p: 'p',
+      h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
+      h2: "scroll-m-20 text-3xl font-semibold tracking-tight",
+      h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
+      h4: "scroll-m-20 text-xl font-semibold tracking-tight",
+      h5: "scroll-m-20 text-lg font-semibold tracking-tight",
+      h6: "scroll-m-20 text-base font-semibold tracking-tight",
+      p: "leading-7",
+      base: "text-base",
+      muted: "text-sm text-muted-foreground",
+      small: "text-sm font-medium leading-none",
     },
   },
-
   defaultVariants: {
-    variant: 'paragraph',
-    tag: 'p',
-    color: 'foreground',
+    variant: "base",
   },
 });
 
-export interface TypographyProps
-  extends VariantProps<typeof typographyVariants> {
-  className?: string;
-  children: React.ReactNode;
+interface TypographyProps
+  extends HTMLAttributes<HTMLParagraphElement>,
+    VariantProps<typeof typographyVariants> {
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div";
 }
 
-const Typography: React.FC<TypographyProps> = ({
-  className,
-  variant,
-  color,
-  tag,
-  children,
-}) => {
-  const getTag = (tag: string) => {
-    switch (tag) {
-      case 'h1':
-        return 'h1';
-      case 'h2':
-        return 'h2';
-      case 'h3':
-        return 'h3';
-      case 'h4':
-        return 'h4';
-      case 'h5':
-        return 'h5';
-      case 'h6':
-        return 'h6';
-      default:
-        return 'p';
-    }
-  };
+const Typography = forwardRef<HTMLParagraphElement, TypographyProps>(
+  ({ className, variant, as: Component = "div", ...props }, ref) => {
+    return <Component ref={ref} className={cn(typographyVariants({ variant }), className)} {...props} />;
+  }
+);
 
-  const Tag = getTag(tag!);
-  return (
-    <Tag className={cn(typographyVariants({ variant, color, className }))}>
-      {children}
-    </Tag>
-  );
-};
+Typography.displayName = "Typography";
 
-export default Typography;
+export { Typography, typographyVariants };

@@ -2,7 +2,7 @@ export const ROOT_API = process.env.NEXT_PUBLIC_API_URL;
 
 export const API_ENDPOINT = {
   JOB_POSTS: {
-    PATH: `${ROOT_API}/job-posts`,
+    PATH: `${ROOT_API}/jobs/`,
     CREATE: "/",
     READ: "/",
     UPDATE: "/:id",

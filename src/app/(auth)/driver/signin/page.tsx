@@ -11,12 +11,12 @@ import { SigninVector } from "@/components/svg-vector/signin-vector";
 import { Icons } from "@/components/icon";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { useSignInMutation } from "@/store/api/authDriverApiSlice";
+import { useDriverSigninMutation } from "@/store/api/authDriverApiSlice";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import type { RootState } from "@/lib/store";
 import { useToast } from "@/hooks/useToast";
-import { setCredentials } from "@/store/slice/authSlice";
+import { setCredentials, selectIsAuthenticated } from "@/store/slice/authSlice";
 import type { Error } from "@/interface/IErrorType";
 import { setAuthCookies } from "@/utils/auth";
 
@@ -26,12 +26,12 @@ export default function SigninPage() {
     password: "",
     userType: "driver",
   });
-  const [driverSignin] = useSignInMutation();
+  const [driverSignin] = useDriverSigninMutation();
   const dispatch = useDispatch();
   const toast = useToast();
   const error = useSelector((state: RootState) => state.auth.error);
   const router = useRouter();
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -53,34 +53,33 @@ export default function SigninPage() {
     e.preventDefault();
     try {
       const response = await driverSignin({
-        email: formData.email,
-        password: formData.password,
-        is_carrier: false,
+        ...formData,
         is_driver: true,
+        is_carrier: false,
       }).unwrap();
 
-      if (response.access && response.refresh && response.user) {
-        const formattedResponse = {
-          access: response.access,
-          refresh: response.refresh,
-          user_id: response.user.id,
-          username: response.user.email.split("@")[0], // Assuming username can be derived from email
-          email: response.user.email,
-          is_driver: response.user.is_driver,
-          is_carrier: response.user.is_carrier,
-          is_verified: true, // Set this based on your actual API response if available
-        };
+      if (response.access && response.refresh) {
+        dispatch(
+          setCredentials({
+            access: response.access,
+            refresh: response.refresh,
+            user: {
+              ...response.user,
+              is_driver: true,
+            },
+          })
+        );
 
-        await setAuthCookies(response.access, response.refresh);
-        dispatch(setCredentials(formattedResponse));
+        // Set auth cookies with user type
+        await setAuthCookies(response.access, response.refresh, "driver");
 
         toast.success({
           title: "Sign in successful",
           description: "You have successfully signed in",
         });
 
-        // Redirect to subscription plans page instead of directly to driver dashboard
-        router.push("/subscription-plans");
+        // Redirect to subscription plans instead of driver dashboard
+        router.replace("/subscription-plans");
       }
     } catch (error: unknown) {
       const err = error as Error;

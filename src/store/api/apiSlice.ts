@@ -6,18 +6,26 @@ import {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query/react";
 import { Mutex } from "async-mutex";
-import { setAuthCookies, clearAuthCookies, getAccessToken, getRefreshToken } from "@/utils/auth";
+import { setAuthCookies, clearAuthCookies, getRefreshToken } from "@/utils/auth";
+import { RootState } from "@/store/store";
 
 // Make sure this matches your API URL exactly
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const baseQuery = fetchBaseQuery({
-  baseUrl,
+  baseUrl: baseUrl,
   credentials: "include",
-  prepareHeaders: async (headers) => {
-    const token = await getAccessToken();
+  prepareHeaders: (headers, { getState }) => {
+    const token = (getState() as RootState).auth.accessToken;
+
+    // Add debug log
+    console.log("Request Headers - Auth Token:", {
+      hasToken: !!token,
+      tokenPreview: token ? `${token.substring(0, 20)}...` : "none",
+    });
+
     if (token) {
-      headers.set("authorization", `Bearer ${token}`);
+      headers.set("Authorization", `Bearer ${token}`);
     }
     headers.set("Content-Type", "application/json");
     return headers;
@@ -60,8 +68,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
             access: string;
             refresh: string;
           };
-          await setAuthCookies(access, refresh);
-          // Retry the original query with new token
+          await setAuthCookies(access, refresh, "driver");
           result = await baseQuery(args, api, extraOptions);
         } else {
           await clearAuthCookies();

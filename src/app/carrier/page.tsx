@@ -2,7 +2,7 @@
 
 import { withCarrierAuth } from "@/components/auth/hocs/withCarrierAuth";
 
-function CarrierDashboardPage() {
+function CarrierPage() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Carrier Dashboard</h1>
@@ -10,4 +10,4 @@ function CarrierDashboardPage() {
   );
 }
 
-export default withCarrierAuth(CarrierDashboardPage);
+export default withCarrierAuth(CarrierPage);

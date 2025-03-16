@@ -1,103 +1,81 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icon";
-import { MoreVertical, Heart, MapPin, DollarSign, Clock } from "lucide-react";
+"use client";
+
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import type { Job } from "@/types";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { MapPin, Building2, Clock, DollarSign } from "lucide-react";
+
+interface Job {
+  id: number;
+  title: string;
+  no_of_openings: number;
+  country: string;
+  location: string;
+  shift: string;
+  job_type_names: string[];
+  experience_level_names: string[];
+  application_method_names: string[];
+  language_names: string[];
+  working_days: string;
+  min_pay: string;
+  max_pay: string;
+  description: string;
+  require_resume: boolean;
+  application_updates: boolean;
+  allow_contact: boolean;
+  fair_chance_hiring: boolean;
+  background_check_required: boolean;
+}
 
 interface JobCardProps {
   job: Job;
-  isSelected: boolean;
+  isSelected?: boolean;
   onSelect: (job: Job) => void;
 }
 
 export function JobCard({ job, isSelected, onSelect }: JobCardProps) {
-  // Generate a placeholder logo URL based on the company name
-  const placeholderLogoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-    job.carrier.name
-  )}&background=random&color=fff&size=128`;
-
   return (
     <Card
-      className={`bg-white border cursor-pointer transition-all duration-200 hover:shadow-md ${
-        isSelected ? "border-[#6B5ECD] bg-[#F0F4F8]" : "border-[#D0DDE9]"
+      className={`cursor-pointer transition-all hover:border-primary ${
+        isSelected ? "border-primary" : "border-border/40"
       }`}
       onClick={() => onSelect(job)}
     >
-      <CardHeader className="flex flex-row items-start justify-between p-4">
-        <div className="flex items-start space-x-4">
-          <Avatar className="w-12 h-12 rounded-full">
-            <AvatarImage src={job.carrier.avatar || placeholderLogoUrl} alt={job.carrier.name} />
-            <AvatarFallback className="font-bold text-lg">
-              {job.carrier.name.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+      <CardContent className="p-6">
+        <div className="space-y-4">
           <div>
-            <CardTitle className="text-lg font-semibold text-[#1E2330] hover:text-[#6B5ECD] transition-colors">
-              {job.title}
-            </CardTitle>
-            <p className="text-[#5A6B87] text-sm mt-1">{job.carrier.name}</p>
+            <h3 className="font-semibold text-lg tracking-tight mb-1">{job.title}</h3>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4" />
+              <span>{job.location}</span>
+            </div>
           </div>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 hover:bg-[#F0F4F8] text-[#5A6B87]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Heart className="mr-2 h-4 w-4" />
-              Save job
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Icons.share className="mr-2 h-4 w-4" />
-              Share job
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Icons.flag className="mr-2 h-4 w-4" />
-              Report job
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <div className="space-y-3">
+
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="flex items-center gap-1 text-[#6B5ECD]">
-              <MapPin className="w-3 h-3" />
-              {job.location}
-            </Badge>
-            <Badge variant="secondary" className="flex items-center gap-1 text-[#6B5ECD]">
-              <DollarSign className="w-3 h-3" />${job.salary.toLocaleString()} per year
-            </Badge>
-            <Badge variant="secondary" className="text-[#6B5ECD]">
-              {job.job_type}
-            </Badge>
+            {job.job_type_names.map((type) => (
+              <Badge key={type} variant="secondary" className="bg-[#F0F4F8] text-[#5A6B87]">
+                {type}
+              </Badge>
+            ))}
           </div>
-          <p className="text-[#5A6B87] text-sm line-clamp-2">{job.description}</p>
-          <div className="flex justify-between items-center">
-            <p className="text-[#5A6B87] text-xs flex items-center">
-              <Clock className="w-3 h-3 mr-1" />
-              Posted {job.posted_at}
-            </p>
-            <Badge
-              variant="outline"
-              className={job.status === "Active" ? "text-green-600" : "text-yellow-600"}
-            >
-              {job.status}
-            </Badge>
+
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span>{job.shift}</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <DollarSign className="h-4 w-4" />
+              <span>
+                ${job.min_pay} - ${job.max_pay}/hr
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Building2 className="h-4 w-4" />
+            <span>
+              {job.no_of_openings} {job.no_of_openings === 1 ? "opening" : "openings"}
+            </span>
           </div>
         </div>
       </CardContent>

@@ -1,5 +1,8 @@
+"use client";
+
 import React, { ReactNode } from "react";
 import DriverDashboardHeader from "@/components/driver/DriverDashboardHeader";
+import { withDriverAuth } from "@/components/auth/hocs/withDriverAuth";
 
 interface DriverDashboardLayoutProps {
   children: ReactNode; // Define the children prop
@@ -14,4 +17,4 @@ const DriverDashboardLayout: React.FC<DriverDashboardLayoutProps> = ({ children 
   );
 };
 
-export default DriverDashboardLayout;
+export default withDriverAuth(DriverDashboardLayout);

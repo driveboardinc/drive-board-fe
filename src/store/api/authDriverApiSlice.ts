@@ -69,7 +69,7 @@ export const authDriverApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: [{ type: "JobPost" }],
     }),
 
-    signIn: builder.mutation<AuthResponse, SignInRequest>({
+    driverSignin: builder.mutation<AuthResponse, SignInRequest>({
       query: (credentials) => ({
         url: `${authPath}${API_ENDPOINT.DRIVER.SIGNIN}`,
         method: "POST",
@@ -120,7 +120,8 @@ export const authDriverApiSlice = apiSlice.injectEndpoints({
   overrideExisting: false,
 });
 
-export const { useDriverSignupMutation, useSignInMutation, useRefreshTokenMutation } = authDriverApiSlice;
+export const { useDriverSignupMutation, useDriverSigninMutation, useRefreshTokenMutation } =
+  authDriverApiSlice;
 
 // Export a type-safe hook for checking authentication status
 export const useAuthStatus = () => {

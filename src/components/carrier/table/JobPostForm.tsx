@@ -1,35 +1,21 @@
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 
-import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 
-import {
-  useCreateJobPostMutation,
-  useUpdateJobPostMutation,
-} from '@/store/api/jobPostApiSlice';
-import { ErrorResponse } from '@/interface/IErrorType';
-import { JobPostFormProps } from '@/interface/IDialogFormType';
+import { useCreateJobPostMutation, useUpdateJobPostMutation } from "@/store/api/jobPostApiSlice";
+import { JobPostFormProps as DialogJobPostFormProps } from "@/interface/IDialogFormType";
 import {
   jobPostSchema,
   JobPostFormData,
@@ -39,101 +25,136 @@ import {
   payTypeOptions,
   payRateOptions,
   benefitsOptions,
-} from '@/schema/jobPostSchema';
+} from "@/schema/jobPostSchema";
+import { RootState } from "@/store/store";
 
-export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
+interface JobPostFormExtendedProps extends Omit<DialogJobPostFormProps, "setShowDialog"> {
+  onSave?: (data: JobPostFormData) => void;
+  isWizard?: boolean;
+  setShowDialog?: Dispatch<SetStateAction<boolean>>;
+}
+
+export function JobPostForm({ setShowDialog, post, onSave, isWizard }: JobPostFormExtendedProps) {
   const [createPost] = useCreateJobPostMutation();
   const [updatePost] = useUpdateJobPostMutation();
+  const auth = useSelector((state: RootState) => state.auth);
+  const router = useRouter();
 
   const form = useForm<JobPostFormData>({
     resolver: zodResolver(jobPostSchema),
     defaultValues: {
-      job_title: post?.job_title ?? '',
+      job_title: post?.job_title ?? "",
       num_openings: post?.num_openings ?? 1,
-      location: post?.location ?? '',
-      job_type: post?.job_type ? [post.job_type] : ['Full-time'],
-      shift: post?.shift ?? 'Day',
-      day_range: post?.day_range ?? '',
+      location: post?.location ?? "",
+      job_type: post?.job_type ? [post.job_type] : ["Full-time"],
+      shift: post?.shift ?? "Day",
+      day_range: post?.day_range ?? "",
+      vehicle_type: post?.vehicle_type ?? "Box Truck",
       pay: post?.pay ?? {
-        type: 'Range',
+        type: "Range",
         minimum: 0,
         maximum: 0,
-        rate: 'per hour',
+        rate: "per hour",
       },
-      experience_level: post?.experience_level ?? '3 years',
+      experience_level: post?.experience_level ?? "3 years",
       benefits: post?.benefits ?? [],
-      job_description: post?.job_description ?? '',
+      job_description: post?.job_description ?? "",
       customized_pre_screening: post?.customized_pre_screening ?? [],
       qualifications: post?.qualifications ?? [],
       required_resume: post?.required_resume ?? true,
-      application_updates: post?.application_updates ?? '',
+      application_updates: post?.application_updates ?? "",
       candidates_contact_you: post?.candidates_contact_you ?? true,
       background_check: post?.background_check ?? false,
     },
+    mode: "onChange",
   });
 
-  const { setError } = form;
-
   const onSubmit = async (data: z.infer<typeof jobPostSchema>) => {
-    const payload = {
-      ...data,
+    if (isWizard && onSave) {
+      onSave(data);
+      return;
+    }
+
+    // Add more detailed auth logging
+    const authDetails = {
+      isAuthenticated: auth.isAuthenticated,
+      hasToken: !!auth.accessToken,
+      tokenPreview: auth.accessToken ? `${auth.accessToken.substring(0, 20)}...` : "none",
+      user: auth.user,
     };
+    console.log("JobPostForm - Auth Details:", authDetails);
 
     try {
-      if (!post) {
-        const result = await createPost(payload).unwrap();
-        if (result.success) {
-          toast(result.message);
+      if (!auth.accessToken) {
+        throw new Error("No auth token available");
+      }
 
-          setShowDialog(false);
-        } else {
-          Object.entries(result.data).forEach(([field, messages]) => {
-            if (Array.isArray(messages)) {
-              messages.forEach((message) =>
-                setError(field as keyof JobPostFormData, {
-                  type: 'manual',
-                  message,
-                })
-              );
-            }
-          });
+      // Update the transformed data
+      const transformedData = {
+        ...data,
+        title: data.job_title,
+        description: data.job_description,
+        experience_level: [data.experience_level],
+        // These are now arrays by default from the schema
+        application_method: data.application_method,
+        language: data.language,
+        application_updates: data.application_updates === "" ? false : true,
+        // Remove fields that aren't expected by the API
+        job_title: undefined,
+        job_description: undefined,
+      };
+
+      if (!post) {
+        try {
+          const response = await createPost(transformedData).unwrap();
+          console.log("JobPostForm - Success Response:", response);
+          toast.success("Job post created successfully");
+          setShowDialog?.(false);
+        } catch (error: unknown) {
+          const err = error as { data?: string | { detail?: string } };
+
+          if (
+            typeof err.data === "string" &&
+            err.data.includes("CarrierProfile matching query does not exist")
+          ) {
+            toast.error("Please complete your carrier profile before posting a job");
+            router.push("/carrier/profile/setup"); // Redirect to profile setup
+            return;
+          }
+          throw error; // Re-throw if it's a different error
         }
       } else {
-        const result = await updatePost({
+        await updatePost({
           id: post.id,
-          updates: payload,
+          updates: transformedData,
         }).unwrap();
-        if (result.success) {
-          toast(result.message);
-          setShowDialog(false);
-        } else {
-          Object.entries(result.data).forEach(([field, messages]) => {
-            if (Array.isArray(messages)) {
-              messages.forEach((message) =>
-                setError(field as keyof JobPostFormData, {
-                  type: 'manual',
-                  message,
-                })
-              );
-            }
-          });
-          toast(result.message);
-        }
+        toast.success("Job post updated successfully");
+        setShowDialog?.(false);
       }
     } catch (error: unknown) {
-      const axiosError = error as ErrorResponse;
-      if (!axiosError?.response) {
-        toast(axiosError?.data?.message || 'No server error response');
-      } else {
-        toast('Something went wrong');
-      }
+      const err = error as {
+        status?: number;
+        data?: { detail?: string; [key: string]: unknown };
+        message?: string;
+      };
+      console.error("JobPostForm - Error Details:", {
+        status: err?.status,
+        data: err?.data,
+        message: err?.message,
+      });
+
+      // More specific error message
+      const errorMessage =
+        err?.data?.detail ||
+        (typeof err?.data === "string" ? err.data : "Something went wrong. Please try again.");
+      toast.error(errorMessage);
     }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-4">
+        <div className="space-y-4 px-2">
           <h2 className="text-xl font-bold">Job Details</h2>
 
           <FormField
@@ -219,10 +240,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Shift</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select shift type" />
@@ -255,6 +273,20 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="vehicle_type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Vehicle Type</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter vehicle type" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -262,10 +294,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Payment Type</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select payment type" />
@@ -284,7 +313,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               )}
             />
 
-            {form.watch('pay.type') === 'Range' ? (
+            {form.watch("pay.type") === "Range" ? (
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -297,9 +326,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
                           <Input
                             type="number"
                             {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
+                            onChange={(e) => field.onChange(Number(e.target.value))}
                             placeholder="Enter minimum amount"
                           />
                         </FormControl>
@@ -317,9 +344,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
                           <Input
                             type="number"
                             {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
+                            onChange={(e) => field.onChange(Number(e.target.value))}
                             placeholder="Enter maximum amount"
                           />
                         </FormControl>
@@ -330,9 +355,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
                 </div>
               </>
             ) : (
-              ['Starting Amount', 'Maximum Amount', 'Exact Amount'].includes(
-                form.watch('pay.type')
-              ) && (
+              ["Starting Amount", "Maximum Amount", "Exact Amount"].includes(form.watch("pay.type")) && (
                 <FormField
                   control={form.control}
                   name="pay.amount"
@@ -343,12 +366,8 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
                         <Input
                           type="number"
                           {...field}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
-                          placeholder={`Enter ${form
-                            .watch('pay.type')
-                            .toLowerCase()}`}
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          placeholder={`Enter ${form.watch("pay.type").toLowerCase()}`}
                         />
                       </FormControl>
                       <FormMessage />
@@ -364,10 +383,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Pay Rate</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select pay rate" />
@@ -393,10 +409,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Experience Level</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select experience level" />
@@ -431,9 +444,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
                           const currentValues = field.value || [];
                           const newValues = checked
                             ? [...currentValues, benefit]
-                            : currentValues.filter(
-                                (value) => value !== benefit
-                              );
+                            : currentValues.filter((value) => value !== benefit);
                           field.onChange(newValues);
                         }}
                       />
@@ -455,11 +466,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               <FormItem>
                 <FormLabel>Job Description</FormLabel>
                 <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Enter detailed job description"
-                    className="h-32"
-                  />
+                  <Textarea {...field} placeholder="Enter detailed job description" className="h-32" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -478,11 +485,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               <FormItem>
                 <FormLabel>Application Updates Email</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    type="email"
-                    placeholder="Enter email for application updates"
-                  />
+                  <Input {...field} type="email" placeholder="Enter email for application updates" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -496,10 +499,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               <FormItem className="flex items-center justify-between">
                 <FormLabel>Require Resume</FormLabel>
                 <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
@@ -512,10 +512,7 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               <FormItem className="flex items-center justify-between">
                 <FormLabel>Allow Candidates to Contact You</FormLabel>
                 <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
@@ -528,22 +525,34 @@ export function JobPostForm({ setShowDialog, post }: JobPostFormProps) {
               <FormItem className="flex items-center justify-between">
                 <FormLabel>Background Check Required</FormLabel>
                 <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
           />
         </div>
 
+        {/* Add this debug section above the button */}
+        <div className="space-y-2 text-sm text-red-500">
+          <p>Form State:</p>
+          <ul>
+            {Object.keys(form.formState.errors).map((key) => (
+              <li key={key}>
+                {key}: {(form.formState.errors as Record<string, { message: string }>)[key]?.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <Button
           className="w-full"
           type="submit"
-          disabled={!form.formState.isValid}
+          onClick={() => {
+            // Trigger validation on all fields to show errors
+            form.trigger();
+          }}
         >
-          {post ? 'Update Job Post' : 'Create Job Post'}
+          {post ? "Update Job Post" : "Create Job Post"}
         </Button>
       </form>
     </Form>

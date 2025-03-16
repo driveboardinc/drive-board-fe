@@ -1,16 +1,14 @@
-const ROUTE = {
+export const ROUTE = {
   CARRIER: {
-    PATH: '/carrier',
-    SIGNUP: '/signup',
-    SIGNIN: '/signin',
-    DASHBOARD: '/dashboard',
+    PATH: "/carrier",
+    SIGNUP: "/carrier/signup",
+    SIGNIN: "/carrier/signin",
+    DASHBOARD: "/carrier",
   },
   DRIVER: {
-    PATH: '/driver',
-    SIGNUP: '/signup',
-    SIGNIN: '/signin',
-    DASHBOARD: '/dashboard',
+    PATH: "/driver",
+    SIGNUP: "/driver/signup",
+    SIGNIN: "/driver/signin",
+    DASHBOARD: "/driver",
   },
-};
-
-export default ROUTE;
+} as const;

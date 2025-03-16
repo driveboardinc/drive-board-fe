@@ -1,158 +1,100 @@
-import { DotsHorizontalIcon } from '@radix-ui/react-icons';
-import { Row } from '@tanstack/react-table';
-
-import { Button } from '@/components/ui/button';
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { Row } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  // DropdownMenuContent,
-  // DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import Link from "next/link";
+import { useDeleteJobPostMutation } from "@/store/api/jobPostApiSlice";
+import { TablePost } from "@/schema/postSchema";
+import { useState } from "react";
+import { useToast } from "@/hooks/useToast";
 
-import { useState } from 'react';
-
-import { JobPostForm } from './JobPostForm';
-import { ResponsiveDialog } from '@/components/ui/ResponsiveDialog';
-// import { STATUS, Status } from '@/constants/STATUS';
-// import {
-//   useDeleteJobPostMutation,
-//   useUpdateJobPostMutation,
-// } from '@/app/api/jobPostApiSlice';
-// import { ErrorResponse } from '@/interface/IErrorType';
-// import { useRouter } from 'next/router';
-// import { toast } from 'sonner';
-import { tableJobPostSchema } from '@/schema/jobPostSchema';
-
-interface DataTableRowActionsProps<TData> {
-  row: Row<TData>;
+interface DataTableRowActionsProps {
+  row: Row<TablePost>;
 }
 
-export function DataTableRowActions<TData>({
-  row,
-}: DataTableRowActionsProps<TData>) {
-  // const router = useRouter();
-  const post = tableJobPostSchema.parse(row.original);
+export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+  const toast = useToast();
+  const [deletePost] = useDeleteJobPostMutation();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
-
-  // const [updatePost] = useUpdateJobPostMutation();
-  // const [deletePost] = useDeleteJobPostMutation();
-
-  // const handleClick = async (value: Status) => {
-  //   try {
-  //     const { id, ...updates } = post;
-  //     updates.status = value;
-  //     const response = await updatePost({ id, updates }).unwrap();
-
-  //     toast(response.message);
-  //   } catch (error: unknown) {
-  //     const axiosError = error as ErrorResponse;
-  //     if (!axiosError?.response) {
-  //       toast('No server error response');
-  //     } else if (axiosError?.response?.status === 400) {
-  //       toast('Missing email or password!');
-  //     } else if (axiosError?.response?.status === 401) {
-  //       toast('Unauthorized');
-  //     } else {
-  //       toast('Login Failed');
-  //     }
-  //   }
-  // };
-
-  // const handleDeleteAccount = async () => {
-  //   try {
-  //     const result = await deletePost({
-  //       id: post.id,
-  //     }).unwrap();
-  //     toast(result?.message);
-  //   } catch (error) {
-  //     const axiosError = error as ErrorResponse;
-  //     if (!axiosError?.response) {
-  //       toast('No server error response');
-  //     } else if (axiosError?.response?.status === 400) {
-  //       toast('Missing username or password!');
-  //     } else if (axiosError?.response?.status === 401) {
-  //       toast('Unauthorized');
-  //     } else {
-  //       toast('Login Failed');
-  //     }
-  //   }
-  // };
-
-  // const handleViewBlogPost = () => {
-  //   router.push(`/`);
-  // };
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await deletePost({ id: row.original.id }).unwrap();
+      toast.success({
+        title: "Success",
+        description: "Job post deleted successfully",
+      });
+      setShowDeleteDialog(false);
+    } catch {
+      toast.error({
+        title: "Error",
+        description: "Failed to delete job post",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <>
-      <ResponsiveDialog
-        isOpen={isUpdateOpen}
-        setIsOpen={setIsUpdateOpen}
-        title="Edit Post"
-        description="Update the post details below by changing values."
-      >
-        <JobPostForm setShowDialog={setIsUpdateOpen} post={post} />
-      </ResponsiveDialog>
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the job post.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted text-foreground"
-          >
-            <DotsHorizontalIcon className="h-4 w-4" />
+          <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
+            <DotsHorizontalIcon className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        {/* <DropdownMenuContent align="end" className="w-[160px]">
-          <>
-            <DropdownMenuItem
-              className="flex items-center gap-2"
-              onClick={() => handleClick('Draft')}
-            >
-              {STATUS.Draft}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="flex items-center gap-2"
-              onClick={() => handleClick('Published')}
-            >
-              {STATUS.Published}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="flex items-center gap-2"
-              onClick={() => handleClick('Archived')}
-            >
-              {STATUS.Archived}
-            </DropdownMenuItem>
-          </>
-          <hr />
-
-  
-          {post.status === 'Published' && (
-            <DropdownMenuItem
-              className="flex items-center gap-2"
-              onClick={handleViewBlogPost}
-            >
-              View
-            </DropdownMenuItem>
-          )}
+        <DropdownMenuContent align="end">
+          <Link href={`/carrier/job-posts/${row.original.id}/edit`}>
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+          </Link>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="flex items-center gap-2"
-            onClick={() => {
-              setIsUpdateOpen(true);
-            }}
-          >
-            Edit
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            className="flex items-center gap-2"
-            onClick={handleDeleteAccount}
+            className="text-red-600 focus:bg-red-50 focus:text-red-600"
+            onClick={() => setShowDeleteDialog(true)}
           >
             Delete
           </DropdownMenuItem>
-
-        </DropdownMenuContent> */}
+        </DropdownMenuContent>
       </DropdownMenu>
     </>
   );

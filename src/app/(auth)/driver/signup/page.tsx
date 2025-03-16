@@ -18,7 +18,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDriverSignupMutation } from "@/store/api/authDriverApiSlice";
 import { useToast } from "@/hooks/useToast";
-import ROUTE from "@/constants/ROUTE";
+import { ROUTE } from "@/constants/ROUTE";
 import type { Error } from "@/interface/IErrorType";
 
 const getVisibleQuestions = (questions: Question[], formData: FormData) => {

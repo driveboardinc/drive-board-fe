@@ -1,30 +1,26 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ResponsiveDialog } from './ResponsiveDialog';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ResponsiveDialog } from "./ResponsiveDialog";
+import Link from "next/link";
 
 interface AddEntityButtonProps {
-  FormComponent: React.FC<{
-    setShowDialog: React.Dispatch<React.SetStateAction<boolean>>;
-  }>;
   buttonLabel: string;
   dialogTitle: string;
   dialogDescription: string;
+  url?: string;
 }
 
 export const AddEntityButton: React.FC<AddEntityButtonProps> = ({
-  FormComponent,
   buttonLabel,
   dialogTitle,
   dialogDescription,
+  url,
 }) => {
   const [showDialog, setShowDialog] = useState(false);
 
   return (
     <>
-      <Button
-        onClick={() => setShowDialog(!showDialog)}
-        className="h-8 w-full md:w-auto"
-      >
+      <Button onClick={() => setShowDialog(!showDialog)} className="h-8 w-full md:w-auto">
         {buttonLabel}
       </Button>
       <ResponsiveDialog
@@ -33,7 +29,8 @@ export const AddEntityButton: React.FC<AddEntityButtonProps> = ({
         title={dialogTitle}
         description={dialogDescription}
       >
-        <FormComponent setShowDialog={setShowDialog} />
+        {/* <FormComponent setShowDialog={setShowDialog} /> */}
+        {url && <Link href={url}>{url}</Link>}
       </ResponsiveDialog>
     </>
   );

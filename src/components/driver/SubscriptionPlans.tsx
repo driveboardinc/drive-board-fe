@@ -37,7 +37,7 @@ export default function SubscriptionPlans() {
             description:
               "Your 1-day free trial has started. You will be charged $19.99/month after the trial period.",
           });
-          router.push("/driver");
+          router.replace("/driver");
         }, 1500);
       } else {
         // Free plan selected
@@ -45,7 +45,7 @@ export default function SubscriptionPlans() {
           title: "Free plan activated",
           description: "You can upgrade to premium anytime from your account settings.",
         });
-        router.push("/driver");
+        router.replace("/driver");
       }
     } catch {
       toast.error({
