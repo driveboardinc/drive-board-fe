@@ -133,15 +133,14 @@ export default function SignupPage() {
     e.preventDefault();
 
     const requiredFields = visibleQuestions.filter((q) => q.required).map((q) => q.id);
-    requiredFields.push("email", "password"); // Remove recent_felony and past_felony since they're not in questions
+    requiredFields.push("email", "password", "recent_felony", "past_felony"); // Ensure these fields are required
 
     const missingFields = requiredFields.filter((field) => !formData[field]);
 
     if (missingFields.length > 0) {
-      console.log("Missing fields:", missingFields); // Add this debug log
       toast.error({
         title: "Missing required fields",
-        description: `Please fill in: ${missingFields.join(", ")}`, // Show which fields are missing
+        description: "Please fill in all required fields before submitting.",
       });
       return;
     }
@@ -153,9 +152,8 @@ export default function SignupPage() {
         password: formData.password,
         is_driver: true,
         is_carrier: false,
+        user: formData.userId, // Ensure this is the correct pk value
       }).unwrap();
-
-      console.log("Signup response:", response); // Add this debug log
 
       if (response.email) {
         toast.success({
@@ -173,11 +171,6 @@ export default function SignupPage() {
         if (err.originalStatus === 400) {
           // Log the actual validation errors from the API
           console.log("Validation errors:", err.data);
-
-          toast.error({
-            title: "Validation Error",
-            description: err.data?.message || "Please check your information and try again.",
-          });
         } else if (err.originalStatus === 409) {
           toast.error({
             title: "Account Already Exists",
