@@ -133,14 +133,15 @@ export default function SignupPage() {
     e.preventDefault();
 
     const requiredFields = visibleQuestions.filter((q) => q.required).map((q) => q.id);
-    requiredFields.push("email", "password", "recent_felony", "past_felony"); // Ensure these fields are required
+    requiredFields.push("email", "password"); // Remove recent_felony and past_felony since they're not in questions
 
     const missingFields = requiredFields.filter((field) => !formData[field]);
 
     if (missingFields.length > 0) {
+      console.log("Missing fields:", missingFields); // Add this debug log
       toast.error({
         title: "Missing required fields",
-        description: "Please fill in all required fields before submitting.",
+        description: `Please fill in: ${missingFields.join(", ")}`, // Show which fields are missing
       });
       return;
     }
@@ -152,8 +153,9 @@ export default function SignupPage() {
         password: formData.password,
         is_driver: true,
         is_carrier: false,
-        user: formData.userId, // Ensure this is the correct pk value
       }).unwrap();
+
+      console.log("Signup response:", response); // Add this debug log
 
       if (response.email) {
         toast.success({
@@ -165,12 +167,16 @@ export default function SignupPage() {
       }
     } catch (error: unknown) {
       const err = error as Error;
+      console.log("Full error details:", err); // Add this debug log
 
       if (err && err.originalStatus) {
         if (err.originalStatus === 400) {
+          // Log the actual validation errors from the API
+          console.log("Validation errors:", err.data);
+
           toast.error({
             title: "Validation Error",
-            description: "Please check your information and try again.",
+            description: err.data?.message || "Please check your information and try again.",
           });
         } else if (err.originalStatus === 409) {
           toast.error({
@@ -273,15 +279,13 @@ export default function SignupPage() {
                     />
                   ) : (
                     <Input
-                      type="number"
                       ref={inputRef}
-                      // id={question.id}
-                      id="experience"
-                      // type={question.type}
+                      id={question.id}
+                      type={question.type}
                       onChange={handleInputChange}
-                      value={formData.experience || ""}
+                      value={formData[question.id] || ""}
                       placeholder={question.placeholder}
-                      required
+                      required={question.required}
                       className="w-full h-12"
                     />
                   )}
