@@ -20,6 +20,9 @@ export default function CarrierSignInPage() {
   const toast = useToast();
   const dispatch = useDispatch();
 
+  // Mock carrier credentials for testing:
+  // Email: carrier@example.com
+  // Password: Carrier123!
   const [formData, setFormData] = useState<CarrierSigninFormData>({
     email: "",
     password: "",
@@ -145,6 +148,14 @@ export default function CarrierSignInPage() {
               Sign in
             </Button>
           </form>
+          <div className="text-center text-sm">
+            <p className="text-muted-foreground">
+              Don&apos;t have an account?{" "}
+              <Link href={ROUTE.CARRIER.SIGNUP} className="text-primary hover:underline">
+                Sign up
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

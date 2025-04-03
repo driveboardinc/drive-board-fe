@@ -5,6 +5,17 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("accessToken")?.value;
   const userType = request.cookies.get("userType")?.value;
   const path = request.nextUrl.pathname;
+  const method = request.method;
+
+  // Allow POST requests to signup endpoints
+  if (method === "POST" && (path.includes("/signup") || path.includes("/api"))) {
+    return NextResponse.next();
+  }
+
+  // Allow access to signup pages and their API routes without authentication
+  if (path.includes("/signup") || path.includes("/auth/signup")) {
+    return NextResponse.next();
+  }
 
   // Allow access to subscription plans page if authenticated
   if (path === "/subscription-plans") {
@@ -18,7 +29,6 @@ export function middleware(request: NextRequest) {
   if (token) {
     if (path.includes("/signin") || path.includes("/signup")) {
       if (userType === "driver") {
-        // Don't redirect to /driver directly, let the component handle subscription flow
         return NextResponse.redirect(new URL("/subscription-plans", request.url));
       }
       if (userType === "carrier") {
@@ -49,5 +59,6 @@ export const config = {
     "/driver/signup",
     "/carrier/signup",
     "/subscription-plans",
+    "/api/:path*", // Add this to handle API routes
   ],
 };
