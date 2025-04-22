@@ -194,10 +194,10 @@ export default function SignupPage() {
 
   return (
     <div className="w-full h-screen flex items-center overflow-hidden bg-white shadow-xl">
-      <div className="w-1/2 h-full bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center">
+      <div className="w-[40%] h-full bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center">
         <SignupVector className="w-full h-auto max-h-[80vh]" />
       </div>
-      <div className="w-1/2 h-full flex flex-col justify-center items-start p-8">
+      <div className="w-[60%] h-full flex flex-col justify-center items-start p-8">
         <div className="flex items-center gap-2 py-2">
           <Truck className="w-10 h-10 text-custom-purple" />
           <h1 className="text-3xl font-bold text-gray-800">Drive. Earn. Succeed.</h1>

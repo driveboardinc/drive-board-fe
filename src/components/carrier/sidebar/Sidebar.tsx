@@ -1,12 +1,7 @@
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarFooter,
-} from '@/components/ui/sidebar';
-import Image from 'next/image';
-import companyLogo from '@/assets/images/logo.png';
-import { Menu } from './Menu';
+import { Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from "@/components/ui/sidebar";
+import Image from "next/image";
+import companyLogo from "@/assets/images/logo.png";
+import { Menu } from "./Menu";
 
 export function CarrierSidebar() {
   return (
@@ -27,7 +22,7 @@ export function CarrierSidebar() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
               <Image
-                src="/path/to/avatar.jpg" // Replace with your avatar image path
+                src="/thumbnail.webp" // Replace with your avatar image path
                 alt="User avatar"
                 width={40}
                 height={40}

@@ -6,7 +6,10 @@ import {
   SquarePen,
   LayoutGrid,
   LucideIcon,
-} from 'lucide-react';
+  Brain,
+  Calendar,
+  FileText,
+} from "lucide-react";
 
 type Submenu = {
   href: string;
@@ -42,17 +45,17 @@ export function getCarrierMenuList(pathname: string): Group[] {
     //   ],
     // },
     {
-      groupLabel: 'Jobs',
+      groupLabel: "Jobs",
       menus: [
         {
-          href: '/carrier/dashboard',
-          label: 'Dashboard',
+          href: "/carrier/dashboard",
+          label: "Dashboard",
           icon: LayoutGrid,
           submenus: [],
         },
         {
-          href: '/carrier/job-posts',
-          label: 'Job Posts',
+          href: "/carrier/job-posts",
+          label: "Job Posts",
           icon: SquarePen,
           // submenus: [
           //   {
@@ -61,24 +64,44 @@ export function getCarrierMenuList(pathname: string): Group[] {
           //   },
           // ],
         },
+        {
+          href: "/carrier/smart-sourcing",
+          label: "Smart Sourcing",
+          icon: Brain,
+        },
+        {
+          href: "/carrier/interviews",
+          label: "Interviews",
+          icon: Calendar,
+        },
         // {
         //   href: '/carrier/job-posts',
         //   label: 'Categories',
         //   icon: Bookmark,
         // },
-      ],
-    },
-    {
-      groupLabel: 'Settings',
-      menus: [
         {
-          href: '/carrier/users',
-          label: 'Users',
+          href: "/carrier/candidates",
+          label: "Candidates",
           icon: Users,
         },
         {
-          href: '/carrier/account',
-          label: 'Account',
+          href: "/carrier/other-details",
+          label: "Other Details",
+          icon: FileText,
+        },
+      ],
+    },
+    {
+      groupLabel: "Settings",
+      menus: [
+        {
+          href: "/carrier/users",
+          label: "Users",
+          icon: Users,
+        },
+        {
+          href: "/carrier/account",
+          label: "Account",
           icon: Settings,
         },
       ],

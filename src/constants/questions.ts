@@ -14,6 +14,17 @@ export interface FormData {
 }
 
 export const questions: Question[] = [
+  {
+    id: "driver_type",
+    label: "What type of driver are you?",
+    type: "button-select",
+    required: true,
+    options: [
+      { value: "transport_company", label: "Transport Company" },
+      { value: "carrier", label: "Carrier" },
+      { value: "job_seeker", label: "Owner Operator" },
+    ],
+  },
   { id: "first_name", label: "What's your first name?", type: "text", placeholder: "John", required: true },
   { id: "last_name", label: "And your last name?", type: "text", placeholder: "Doe", required: true },
   {
@@ -38,17 +49,7 @@ export const questions: Question[] = [
     placeholder: "Enter your zip code",
     required: true,
   },
-  {
-    id: "driver_type",
-    label: "What type of driver are you?",
-    type: "button-select",
-    required: true,
-    options: [
-      { value: "owner_operator", label: "Owner Operator" },
-      { value: "delivery_courier", label: "Delivery Courier" },
-      { value: "job_seeker", label: "Regular Job Seeker" },
-    ],
-  },
+
   {
     id: "vehicle_type",
     label: "What type of vehicle do you drive?",
